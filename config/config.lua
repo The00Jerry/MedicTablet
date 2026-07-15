@@ -163,6 +163,19 @@ Config.Security = {
 }
 
 -----------------------------------------------------------------------------
+-- 6b. WEB-APP RECHNUNGS-BRUECKE
+-----------------------------------------------------------------------------
+-- Die externe Web-App legt Rechnungswuensche in der Tabelle mt_invoice_queue ab.
+-- Dieser Poller holt sie ab und erstellt sie ECHT ueber den Billing-Adapter.
+-- Benoetigt sql/webapp.sql. Deaktivieren, wenn keine Web-App genutzt wird.
+Config.WebBridge = {
+    enabled            = true,
+    pollIntervalSeconds= 5,
+    batch              = 10,  -- max. Rechnungen pro Durchlauf
+    maxAttempts        = 3,   -- Wiederholungen bei transienten Fehlern
+}
+
+-----------------------------------------------------------------------------
 -- 7. IDENTIFIER
 -----------------------------------------------------------------------------
 -- Permanenter Charakter-Identifier. ESX Legacy: 'identifier' (license:...) in users-Tabelle.

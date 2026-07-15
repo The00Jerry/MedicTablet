@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+<title>SunLife Medic-Panel</title>
+<link rel="stylesheet" href="/style.css"/>
+</head>
+<body>
+<div id="mt-root">
+  <div id="mt-toasts"></div>
+  <div id="mt-modal" class="mt-modal-overlay mt-hidden"><div class="mt-modal" id="mt-modal-box"></div></div>
+
+  <div id="mt-tablet" class="mt-app">
+    <aside class="mt-sidebar" id="mt-sidebar">
+      <div class="mt-brand">
+        <div class="mt-logo-badge">✚</div>
+        <div class="mt-brand-text"><span id="mt-clinic">SunLife Medical</span><small id="mt-server">SunLife Roleplay</small></div>
+      </div>
+      <nav id="mt-nav" class="mt-nav"></nav>
+      <div class="mt-user">
+        <img id="mt-avatar" class="mt-avatar-img" alt="" style="display:none"/>
+        <div class="mt-avatar" id="mt-avatar-fallback">M</div>
+        <div class="mt-user-info"><span id="mt-username">-</span><small id="mt-userrole">-</small></div>
+        <button class="mt-icon-btn" id="mt-logout" title="Abmelden">⎋</button>
+      </div>
+    </aside>
+
+    <main class="mt-main">
+      <header class="mt-topbar">
+        <button class="mt-icon-btn mt-burger" id="mt-burger">☰</button>
+        <h1 id="mt-view-title">Dashboard</h1>
+        <div class="mt-top-actions" id="mt-top-actions"></div>
+      </header>
+      <section id="mt-content" class="mt-content"></section>
+    </main>
+  </div>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>

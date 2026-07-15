@@ -91,6 +91,19 @@ Nach dem Schließen werden Maus/Tastatur/Spielfigur vollständig freigegeben
 
 ---
 
+## Web-App / Team-Panel (echtes Tablet neben dir)
+
+Im Ordner [`webapp/`](webapp/) liegt eine **eigenständige Web-App** (Node.js/Express), die
+du auf einem echten Tablet im Browser öffnest. Sie nutzt **dieselbe MySQL-Datenbank** wie das
+In-Game-Tablet, meldet dich per **Discord-Login** an (Rechte kommen aus Discord-Rollen) und
+kann Akten, Behandlungen, Preisliste, Versicherung und Protokolle ansehen/bearbeiten.
+
+Rechnungen kann nur der laufende FiveM-Server über CodeM erstellen – die Web-App legt sie
+daher in die Warteschlange `mt_invoice_queue`, die der FiveM-Server (`server/webbridge.lua`)
+**echt** über den CodeM-Adapter abarbeitet (idempotent). Einrichtung: [webapp/README.md](webapp/README.md).
+
+> Dafür zusätzlich `sql/webapp.sql` einspielen und `Config.WebBridge.enabled = true` lassen.
+
 ## Dokumentation
 
 | Datei | Inhalt |
@@ -99,6 +112,7 @@ Nach dem Schließen werden Maus/Tastatur/Spielfigur vollständig freigegeben
 | [docs/PERMISSIONS.md](docs/PERMISSIONS.md) | Alle Rechte, Rollenbeispiele, Overrides, Sperren |
 | [docs/CODEM_BILLING.md](docs/CODEM_BILLING.md) | CodeM Billing V2 anbinden (Adapter-Mapping) |
 | [docs/API.md](docs/API.md) | Team-Panel-Vertrag, Sicherheit, Events/Exports/NUI-Callbacks, Fehlerbehandlung |
+| [webapp/README.md](webapp/README.md) | Externe Web-App: Discord-Login, Installation, Rechnungs-Brücke |
 
 ---
 

@@ -1,0 +1,34 @@
+{
+  "port": 8080,
+  "publicUrl": "https://panel.deinserver.de",
+  "cookieSecure": true,
+  "sessionHours": 12,
+
+  "discord": {
+    "guildId": "000000000000000000",
+    "redirectPath": "/auth/callback"
+  },
+
+  "roles": {
+    "_comment": "Discord-Rollen -> Medic-Rechte. adminRoleIds erhalten admin.full. map: Rolle -> Grade (0-4), Rechte kumulativ wie im Spiel.",
+    "adminRoleIds": ["ROLLE_ID_KLINIKLEITUNG"],
+    "map": [
+      { "roleId": "ROLLE_ID_PRAKTIKANT", "grade": 0, "label": "Praktikant" },
+      { "roleId": "ROLLE_ID_SANI",       "grade": 1, "label": "Rettungssanitaeter" },
+      { "roleId": "ROLLE_ID_ARZT",       "grade": 2, "label": "Arzt" },
+      { "roleId": "ROLLE_ID_OBERARZT",   "grade": 3, "label": "Oberarzt" }
+    ]
+  },
+
+  "branding": {
+    "serverName": "SunLife Roleplay",
+    "clinicName": "SunLife Medical Center",
+    "colorPrimary": "#e11d48",
+    "colorAccent": "#f59e0b",
+    "theme": "dark"
+  },
+
+  "billingBridge": { "enabled": true },
+
+  "rateLimit": { "windowMs": 10000, "max": 120 }
+}

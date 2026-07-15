@@ -50,6 +50,7 @@ server_scripts {
     'server/insurance.lua',
     'server/insurance_billing.lua',
     'server/billing.lua',
+    'server/webbridge.lua',
     'server/panel.lua',
 }
 

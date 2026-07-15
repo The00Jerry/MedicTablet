@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<title>SunLife Medic-Panel – Anmeldung</title>
+<link rel="stylesheet" href="/style.css"/>
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="login-logo">✚</div>
+    <h1>SunLife Medical Center</h1>
+    <p class="login-sub">Team-Panel · Anmeldung erforderlich</p>
+    <div id="login-msg"></div>
+    <a class="mt-btn big" href="/login">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" style="margin-right:8px"><path d="M20.3 4.4A19 19 0 0 0 15.5 3l-.24.5a17 17 0 0 1 4.3 1.5A16 16 0 0 0 4.4 4.9 17 17 0 0 1 8.7 3.5L8.5 3a19 19 0 0 0-4.8 1.4C1 8.5.3 12.5.6 16.4A19 19 0 0 0 6.4 19l.5-.7c-.9-.3-1.7-.7-2.5-1.2l.6-.4c4.6 2.1 9.6 2.1 14.1 0l.6.4c-.8.5-1.6.9-2.5 1.2l.5.7a19 19 0 0 0 5.8-2.6c.4-4.5-.6-8.5-3.7-12.2ZM8.6 14.3c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Zm6.8 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2Z"/></svg>
+      Mit Discord anmelden
+    </a>
+    <p class="login-hint">Der Zugriff richtet sich nach deiner Discord-Rolle im SunLife-Server.</p>
+  </div>
+  <script>
+    const p = new URLSearchParams(location.search);
+    const box = document.getElementById('login-msg');
+    if (p.get('denied')) box.innerHTML = '<div class="login-err">Kein Zugriff: Deinem Discord-Account ist keine Medic-Rolle zugeordnet.</div>';
+    else if (p.get('error')) box.innerHTML = '<div class="login-err">Anmeldung fehlgeschlagen. Bitte erneut versuchen.</div>';
+  </script>
+</body>
+</html>
