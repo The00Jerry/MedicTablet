@@ -1,0 +1,55 @@
+<div id="mt-root" class="mt-hidden">
+  <!-- Notifications -->
+  <div id="mt-toasts"></div>
+
+  <!-- Modal / Confirm -->
+  <div id="mt-modal" class="mt-modal-overlay mt-hidden">
+    <div class="mt-modal" id="mt-modal-box"></div>
+  </div>
+
+  <!-- ============ TABLET MODE ============ -->
+  <div id="mt-tablet" class="mt-app mt-hidden">
+    <aside class="mt-sidebar">
+      <div class="mt-brand">
+        <img id="mt-logo" src="assets/logo.svg" alt="Logo" />
+        <div class="mt-brand-text">
+          <span id="mt-clinic">SunLife Medical</span>
+          <small id="mt-server">SunLife Roleplay</small>
+        </div>
+      </div>
+      <nav id="mt-nav" class="mt-nav"></nav>
+      <div class="mt-user">
+        <div class="mt-avatar" id="mt-avatar">M</div>
+        <div class="mt-user-info">
+          <span id="mt-username">-</span>
+          <small id="mt-userrole">-</small>
+        </div>
+        <button class="mt-icon-btn" id="mt-close" title="Schliessen">&times;</button>
+      </div>
+    </aside>
+
+    <main class="mt-main">
+      <header class="mt-topbar">
+        <h1 id="mt-view-title">Dashboard</h1>
+        <div class="mt-top-actions" id="mt-top-actions"></div>
+      </header>
+      <section id="mt-content" class="mt-content"></section>
+    </main>
+  </div>
+
+  <!-- ============ INSURANCE (NPC) MODE ============ -->
+  <div id="mt-insurance" class="mt-ins mt-hidden">
+    <div class="mt-ins-card">
+      <header class="mt-ins-head">
+        <div>
+          <h1>Krankenversicherung</h1>
+          <small id="mt-ins-server">SunLife Roleplay</small>
+        </div>
+        <button class="mt-icon-btn" id="mt-ins-close" title="Schliessen">&times;</button>
+      </header>
+      <div id="mt-ins-body" class="mt-ins-body"></div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
