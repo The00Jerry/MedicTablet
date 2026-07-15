@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Medic-Tablet – Browser-Vorschau (Mock)</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  /* Vorschau-Hintergrund, damit man das Panel sieht (im Spiel ist er transparent) */
+  html,body{background:radial-gradient(circle at 30% 20%,#1b2942,#070b13)!important}
+  /* Schaltleiste der Vorschau (existiert nur hier, nicht im echten Script) */
+  #mtp-bar{position:fixed;top:10px;left:10px;z-index:9999;display:flex;gap:8px;
+    background:#0b0f19cc;border:1px solid #26304a;border-radius:12px;padding:8px 10px;
+    font-family:Segoe UI,system-ui,sans-serif;box-shadow:0 8px 30px #0008}
+  #mtp-bar button{background:#1a2234;color:#e7ecf5;border:1px solid #26304a;border-radius:8px;
+    padding:7px 12px;cursor:pointer;font-size:12.5px}
+  #mtp-bar button:hover{border-color:#e11d48}
+  #mtp-bar .tag{color:#9aa6bd;font-size:11px;align-self:center;margin-right:4px}
+</style>
+</head>
+<body>
+
+<div id="mtp-bar">
+  <span class="tag">Vorschau (Mock-Daten):</span>
+  <button onclick="MTP.open('tablet')">🖥 Tablet</button>
+  <button onclick="MTP.open('insurance')">❤ Versicherungs-NPC</button>
+  <button onclick="location.reload()">⟳ Reset</button>
+</div>
+
+<!-- Gleiches Markup wie index.html -->
+<div id="mt-root" class="mt-hidden">
+  <div id="mt-toasts"></div>
+  <div id="mt-modal" class="mt-modal-overlay mt-hidden"><div class="mt-modal" id="mt-modal-box"></div></div>
+
+  <div id="mt-tablet" class="mt-app mt-hidden">
+    <aside class="mt-sidebar">
+      <div class="mt-brand">
+        <img id="mt-logo" src="assets/logo.svg" alt="Logo"/>
+        <div class="mt-brand-text"><span id="mt-clinic">SunLife Medical</span><small id="mt-server">SunLife Roleplay</small></div>
+      </div>
+      <nav id="mt-nav" class="mt-nav"></nav>
+      <div class="mt-user">
+        <div class="mt-avatar" id="mt-avatar">M</div>
+        <div class="mt-user-info"><span id="mt-username">-</span><small id="mt-userrole">-</small></div>
+        <button class="mt-icon-btn" id="mt-close" title="Schliessen">&times;</button>
+      </div>
+    </aside>
+    <main class="mt-main">
+      <header class="mt-topbar"><h1 id="mt-view-title">Dashboard</h1><div class="mt-top-actions" id="mt-top-actions"></div></header>
+      <section id="mt-content" class="mt-content"></section>
+    </main>
+  </div>
+
+  <div id="mt-insurance" class="mt-ins mt-hidden">
+    <div class="mt-ins-card">
+      <header class="mt-ins-head">
+        <div><h1>Krankenversicherung</h1><small id="mt-ins-server">SunLife Roleplay</small></div>
+        <button class="mt-icon-btn" id="mt-ins-close" title="Schliessen">&times;</button>
+      </header>
+      <div id="mt-ins-body" class="mt-ins-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MOCK-SCHICHT (nur fuer die Vorschau) ============ -->
+<script>
+(function () {
+  'use strict';
+  const money = v => Math.floor(Number(v) || 0);
+
+  // --- Beispiel-Datenbestand ---
+  const BRANDING = { serverName:'SunLife Roleplay', clinicName:'SunLife Medical Center',
+    logo:'assets/logo.svg', theme:'dark', colorPrimary:'#e11d48', colorAccent:'#f59e0b', colorBg:'#0b0f19' };
+  const FEATURES = { tabletEnabled:true, dashboard:true, patientSearch:true, treatments:true,
+    invoicing:true, pricelist:true, insurance:true, insuranceNPC:true, staffOverview:true, auditLog:true, settings:true };
+  const PERMS = { 'admin.full': true }; // volle Rechte -> alle Ansichten sichtbar
+
+  const CATS = [
+    { id:1, cat_key:'diagnostics', label:'Diagnostik', sort:10 },
+    { id:2, cat_key:'treatment',   label:'Behandlung', sort:20 },
+    { id:3, cat_key:'surgery',     label:'Chirurgie',  sort:30 },
+  ];
+  const ITEMS = [
+    { id:1, code:'EXAM01', label:'Erstuntersuchung', description:'Aufnahme & Diagnostik', category_id:1, price:250, active:1, required_perm:'' },
+    { id:2, code:'TREAT01', label:'Allgemeine Behandlung', description:'Standardbehandlung', category_id:2, price:400, active:1, required_perm:'' },
+    { id:3, code:'WOUND01', label:'Wundversorgung', description:'Reinigung, Naht, Verband', category_id:2, price:350, active:1, required_perm:'' },
+    { id:4, code:'XRAY01', label:'Roentgenuntersuchung', description:'Bildgebung', category_id:1, price:600, active:1, required_perm:'' },
+    { id:5, code:'SURG01', label:'Operation', description:'Operativer Eingriff', category_id:3, price:3500, active:1, required_perm:'' },
+    { id:6, code:'CPR01', label:'Wiederbelebung', description:'Reanimation', category_id:3, price:2500, active:0, required_perm:'' },
+  ];
+  const TIERS = [
+    { id:1, tier_key:'basic', label:'Basisversicherung', description:'Grundschutz.', color:'#38bdf8', icon:'shield', weekly_premium:500, coverage_pct:20, max_per_invoice:2000, weekly_cap:5000, active:1, min_term_days:0, cancel_notice_days:0, waiting_days:0 },
+    { id:2, tier_key:'comfort', label:'Komfortversicherung', description:'Erweiterter Schutz.', color:'#34d399', icon:'shield-check', weekly_premium:1200, coverage_pct:50, max_per_invoice:5000, weekly_cap:12000, active:1, min_term_days:7, cancel_notice_days:0, waiting_days:0 },
+    { id:3, tier_key:'premium', label:'Premiumversicherung', description:'Maximaler Schutz.', color:'#f59e0b', icon:'crown', weekly_premium:2500, coverage_pct:80, max_per_invoice:15000, weekly_cap:30000, active:1, min_term_days:14, cancel_notice_days:7, waiting_days:1 },
+  ];
+  const CONTRACT = {
+    hasContract:true, tier:TIERS[1], status:'active', coverable:true, reason:'ok',
+    started_at:'2026-07-01 12:00', next_charge_at:'2026-07-20 04:00', last_charge_at:'2026-07-13 04:00',
+    grace_until:null, waiting_until:null, cancel_effective_at:null, failed_count:0, weekly_remaining:11000
+  };
+  const RECORD = {
+    identifier:'char1:license:2b1c9', char_id:14, firstname:'Max', lastname:'Mustermann',
+    dateofbirth:'1994-03-12', sex:'m', phone:'0176-4421', blood_type:'0+',
+    allergies:'Penicillin', preconditions:'Asthma', medications:'Salbutamol', medical_notes:'Raucher',
+    last_treatment_at:'2026-07-13 09:20'
+  };
+  const TREATMENTS = [
+    { id:101, treatment_no:'BH-20260713-004', staff_name:'Dr. Jane Doe', diagnosis:'Schnittwunde Unterarm', status:'completed', amount_base:750, amount_insurance:375, amount_discount:0, amount_final:375, created_at:'2026-07-13 09:20' },
+    { id:102, treatment_no:'BH-20260714-011', staff_name:'Dr. Jane Doe', diagnosis:'Kontrolle', status:'ongoing', amount_base:250, amount_insurance:125, amount_discount:0, amount_final:125, created_at:'2026-07-14 16:05' },
+  ];
+  const INVOICES = [
+    { id:9001, invoice_no:'RG-20260713-0042', reason:'Notfallbehandlung', amount_base:750, insurance_amount:375, discount_amount:0, amount_final:375, status:'issued', provider:'esx', provider_invoice_id:'ESXINV123', created_at:'2026-07-13 09:25' },
+  ];
+
+  function contractView(){ return JSON.parse(JSON.stringify(CONTRACT)); }
+
+  // --- Router: liefert das innere data-Objekt ---
+  function route(action, data) {
+    data = data || {};
+    switch (action) {
+      case 'tablet.bootstrap':
+        return { identity:{ name:'Dr. Jane Doe', job:'ambulance', grade:4, identifier:'char1:license:doc99' },
+                 branding:BRANDING, features:FEATURES, perms:PERMS, dashboard:dashboard() };
+      case 'dashboard.data': return { dashboard: dashboard() };
+      case 'patients.search':
+        return { results:[
+          { identifier:RECORD.identifier, firstname:'Max', lastname:'Mustermann', dob:'1994-03-12', phone:'0176-4421', record_id:5, last_treatment_at:'2026-07-13 09:20' },
+          { identifier:'char1:license:77aa', firstname:'Erika', lastname:'Musterfrau', dob:'1990-06-01', phone:'0151-9902', record_id:null, last_treatment_at:null },
+        ], total:2, page:1, pageSize:15 };
+      case 'patients.open':
+        return { record:RECORD, treatments:TREATMENTS, invoices:INVOICES, insurance:contractView() };
+      case 'patients.update': return { ok:true, message:'Gespeichert.' };
+      case 'patients.notes':
+        return { notes:[ { id:1, author_name:'Dr. Jane Doe', body:'Patient wirkt nervoes, Kreislauf stabil.', created_at:'2026-07-13 09:22' } ] };
+      case 'patients.addNote': return { ok:true, id:2 };
+      case 'treatment.get':
+        return { treatment:{ ...TREATMENTS[0], measures:'Wundreinigung, 4 Stiche', medications:'Lokalanaesthesie', report:'Komplikationslos versorgt.', internal_note:'Nachkontrolle in 7 Tagen.' },
+                 items:[ { item_code:'WOUND01', label:'Wundversorgung', unit_price:350, quantity:1, line_total:350 },
+                         { item_code:'EXAM01', label:'Erstuntersuchung', unit_price:250, quantity:1, line_total:250 },
+                         { item_code:'MED01', label:'Medikamentengabe', unit_price:150, quantity:1, line_total:150 } ] };
+      case 'treatment.create': return { ok:true, id:103, treatment_no:'BH-NEU-001', message:'Behandlung gespeichert.' };
+      case 'treatment.update': return { ok:true };
+      case 'treatment.archive': return { ok:true };
+      case 'billing.preview': {
+        const base = 1000, pct = 50, covered = 500, disc = money(data.discount||0);
+        return { lines:[], breakdown:{}, display:{
+          amount_base:base, insurance_name:'Komfortversicherung', insurance_key:'comfort', insurance_pct:pct,
+          insurance_covered:covered, insurance_status:'active', coverable:true, reason_key:'ok',
+          weekly_cap:12000, weekly_remaining:11000, discount:disc, amount_final:Math.max(0, base-covered-disc) } };
+      }
+      case 'billing.create': return { ok:true, invoice_id:9002, invoice_no:'RG-NEU-0001', provider:'esx', provider_invoice_id:'ESXINV999', duplicate:false, message:'Rechnung erstellt.' };
+      case 'billing.cancel': return { ok:true, message:'Storniert.' };
+      case 'pricelist.list': return { categories:CATS, items:ITEMS, canEdit:true };
+      case 'pricelist.saveItem': return { ok:true, id:99 };
+      case 'pricelist.toggle': return { ok:true, active:1 };
+      case 'pricelist.archive': return { ok:true };
+      case 'pricelist.saveCategory': return { ok:true };
+      case 'insurance.tiers': return { tiers:TIERS, canManage:true };
+      case 'insurance.patientView': return { contract:contractView() };
+      case 'insurance.saveTier': return { ok:true };
+      case 'insurance.manageContract': return { ok:true, contract:contractView() };
+      case 'insurance.failedList':
+        return { rows:[ { id:501, identifier:'char1:license:77aa', tier_key:'basic', amount:500, week_key:202629, status:'grace', attempts:1, last_error:'ins_insufficient', scheduled_at:'2026-07-14 04:00' } ], total:1, page:1, pageSize:15 };
+      case 'insurance.retry': return { ok:true, status:'paid' };
+      case 'insurance.npc.get':
+        return { tiers:TIERS, contract:contractView(),
+                 recentCharges:[ { tier_key:'comfort', amount:1200, status:'paid', scheduled_at:'2026-07-13 04:00', charged_at:'2026-07-13 04:00', attempts:1, last_error:'' } ] };
+      case 'insurance.npc.subscribe': return { ok:true, message:'Versicherung abgeschlossen.', contract:contractView() };
+      case 'insurance.npc.switch': return { ok:true, message:'Versicherung gewechselt.', contract:contractView() };
+      case 'insurance.npc.cancel': { const c = contractView(); c.status='cancelled'; c.coverable=false; c.reason='ins_none'; return { ok:true, message:'Versicherung gekuendigt.', contract:c }; }
+      case 'staff.overview':
+        return { onDuty:[ { name:'Dr. Jane Doe', grade_label:'Klinikleitung' }, { name:'San. Tom Meier', grade_label:'Rettungssani' } ],
+                 activity:[ { actor_name:'Dr. Jane Doe', action:'invoice.create', target_type:'invoice', target_id:'9001', result:'ok', created_at:'2026-07-13 09:25' },
+                            { actor_name:'San. Tom Meier', action:'treatment.create', target_type:'treatment', target_id:'102', result:'ok', created_at:'2026-07-14 16:05' } ] };
+      case 'audit.list':
+        return { rows:[
+          { id:5, created_at:'2026-07-14 16:05', actor_name:'San. Tom Meier', actor_identifier:'char1:license:tom', category:'default', action:'treatment.create', target_type:'treatment', target_id:'102', result:'ok' },
+          { id:4, created_at:'2026-07-13 09:25', actor_name:'Dr. Jane Doe', actor_identifier:'char1:license:doc99', category:'billing', action:'invoice.create', target_type:'invoice', target_id:'9001', result:'ok' },
+          { id:3, created_at:'2026-07-13 04:00', actor_name:'System', actor_identifier:'SYSTEM', category:'insurance', action:'insurance.charge.paid', target_type:'insurance', target_id:'char1:license:2b1c9', result:'ok' },
+        ], total:3, page:1, pageSize:25 };
+      case 'settings.get':
+        return { branding:BRANDING, features:FEATURES, notice:{ text:'Willkommen im SunLife Medical Center – Schicht 2 aktiv.' },
+                 panel:{ enabled:false, apiUrl:'https://panel.example.com/api/medictablet', lastSync:[] } };
+      case 'settings.save': return { ok:true, message:'Gespeichert.' };
+      case 'perms.setOverride': return { ok:true };
+      case 'perms.lock': return { ok:true };
+      default: return { ok:true };
+    }
+  }
+
+  function dashboard() {
+    return {
+      onDuty:[ { name:'Dr. Jane Doe', grade_label:'Klinikleitung', grade:4 }, { name:'San. Tom Meier', grade_label:'Rettungssani', grade:1 } ],
+      todayTreatments:7, todayInvoices:4,
+      openTreatments:[ { id:102, treatment_no:'BH-20260714-011', staff_name:'Dr. Jane Doe', diagnosis:'Kontrolle', status:'ongoing', created_at:'2026-07-14 16:05' } ],
+      recentPatients:[ { identifier:RECORD.identifier, firstname:'Max', lastname:'Mustermann', last_treatment_at:'2026-07-13 09:20', updated_at:'2026-07-13 09:25' } ],
+      notice:{ text:'Willkommen im SunLife Medical Center – Schicht 2 aktiv.' }
+    };
+  }
+
+  // --- fetch mocken: faengt https://medictablet/* ab ---
+  const realFetch = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function (url, opts) {
+    const u = String(url);
+    if (u.indexOf('medictablet/') !== -1) {
+      let body = {};
+      try { body = JSON.parse((opts && opts.body) || '{}'); } catch (e) {}
+      if (u.endsWith('/close')) { document.getElementById('mt-root').classList.add('mt-hidden'); return Promise.resolve({ json: () => Promise.resolve({ ok:true }) }); }
+      // /request
+      const data = route(body.action, body.data);
+      return Promise.resolve({ json: () => Promise.resolve({ ok:true, data }) });
+    }
+    return realFetch ? realFetch(url, opts) : Promise.reject('no fetch');
+  };
+
+  // --- Steuerung der Vorschau ---
+  window.MTP = {
+    open: function (mode) {
+      if (mode === 'insurance') {
+        window.postMessage({ type:'open', mode:'insurance', payload:{ insurance: route('insurance.npc.get', {}) } }, '*');
+      } else {
+        window.postMessage({ type:'open', mode:'tablet', payload: route('tablet.bootstrap', {}) }, '*');
+      }
+    }
+  };
+
+  // app.js laden, danach Tablet oeffnen
+  const s = document.createElement('script');
+  s.src = 'app.js';
+  s.onload = function () { setTimeout(function(){ MTP.open('tablet'); }, 60); };
+  document.body.appendChild(s);
+})();
+</script>
+</body>
+</html>
