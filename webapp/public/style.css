@@ -1,11 +1,11 @@
 /* SunLife Medic-Panel (Web-App) – tablet-optimiert, responsive, Touch-freundlich */
 :root{
-  --primary:#e11d48; --accent:#f59e0b;
-  --bg:#0b0f19; --bg2:#111726; --bg3:#1a2234; --line:#26304a;
-  --text:#e7ecf5; --muted:#9aa6bd; --ok:#34d399; --warn:#fbbf24; --danger:#f87171;
-  --radius:14px; --shadow:0 10px 40px rgba(0,0,0,.45);
+  --primary:#b3202e; --accent:#c79a3a;
+  --bg:#0e141c; --bg2:#151d28; --bg3:#1e2836; --line:#2a3646;
+  --text:#e6ebf2; --muted:#93a0b3; --ok:#3fa373; --warn:#c79a3a; --danger:#d05a5a;
+  --radius:10px; --shadow:0 8px 28px rgba(0,0,0,.42);
 }
-:root.mt-light{ --bg:#eef2f9; --bg2:#fff; --bg3:#f4f7fc; --line:#dbe3f0; --text:#1a2234; --muted:#5b667d; --shadow:0 10px 40px rgba(20,30,60,.12); }
+:root.mt-light{ --bg:#eef1f6; --bg2:#fff; --bg3:#f4f6fa; --line:#d8dee8; --text:#1b2430; --muted:#5b667d; --shadow:0 8px 28px rgba(20,30,60,.12); }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;height:100%;background:var(--bg);color:var(--text);
   font-family:'Segoe UI',system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:15px;overflow:hidden}

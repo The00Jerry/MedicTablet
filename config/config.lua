@@ -59,13 +59,14 @@ Config.Open = {
 -----------------------------------------------------------------------------
 Config.Branding = {
     serverName   = 'SunLife Roleplay',
-    clinicName   = 'SunLife Medical Center',
-    departments  = { 'Notaufnahme', 'Chirurgie', 'Innere Medizin', 'Verwaltung' },
+    clinicName   = 'Los Santos Medical Department',
+    shortName    = 'LSMD',            -- Kuerzel (Logo-Badge)
+    departments  = { 'Notaufnahme', 'Rettungsdienst', 'Chirurgie', 'Verwaltung' },
     logo         = 'assets/logo.svg', -- relativ zu html/
     theme        = 'dark',            -- 'dark' | 'light'
-    colorPrimary = '#e11d48',         -- Hauptfarbe (SunLife rot)
-    colorAccent  = '#f59e0b',         -- Akzentfarbe
-    colorBg      = '#0b0f19',         -- Hintergrund (dark)
+    colorPrimary = '#b3202e',         -- LSMD-Rot (gedeckt, klinisch)
+    colorAccent  = '#c79a3a',         -- gedecktes Gold (Akzent/Rabatt)
+    colorBg      = '#0e141c',         -- Hintergrund (dunkles Slate)
 }
 
 -----------------------------------------------------------------------------

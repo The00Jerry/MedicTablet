@@ -22,9 +22,9 @@
 
   "branding": {
     "serverName": "SunLife Roleplay",
-    "clinicName": "SunLife Medical Center",
-    "colorPrimary": "#e11d48",
-    "colorAccent": "#f59e0b",
+    "clinicName": "Los Santos Medical Department",
+    "colorPrimary": "#b3202e",
+    "colorAccent": "#c79a3a",
     "theme": "dark"
   },
 

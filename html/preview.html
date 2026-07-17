@@ -14,7 +14,7 @@
     font-family:Segoe UI,system-ui,sans-serif;box-shadow:0 8px 30px #0008}
   #mtp-bar button{background:#1a2234;color:#e7ecf5;border:1px solid #26304a;border-radius:8px;
     padding:7px 12px;cursor:pointer;font-size:12.5px}
-  #mtp-bar button:hover{border-color:#e11d48}
+  #mtp-bar button:hover{border-color:#b3202e}
   #mtp-bar .tag{color:#9aa6bd;font-size:11px;align-self:center;margin-right:4px}
 </style>
 </head>
@@ -23,7 +23,7 @@
 <div id="mtp-bar">
   <span class="tag">Vorschau (Mock-Daten):</span>
   <button onclick="MTP.open('tablet')">🖥 Tablet</button>
-  <button onclick="MTP.open('insurance')">❤ Versicherungs-NPC</button>
+  <button onclick="MTP.open('insurance')">◆ Versicherungs-NPC</button>
   <button onclick="location.reload()">⟳ Reset</button>
 </div>
 
@@ -36,13 +36,13 @@
     <aside class="mt-sidebar">
       <div class="mt-brand">
         <img id="mt-logo" src="assets/logo.svg" alt="Logo"/>
-        <div class="mt-brand-text"><span id="mt-clinic">SunLife Medical</span><small id="mt-server">SunLife Roleplay</small></div>
+        <div class="mt-brand-text"><span id="mt-clinic">Los Santos Medical Dept.</span><small id="mt-server">SunLife Roleplay</small></div>
       </div>
       <nav id="mt-nav" class="mt-nav"></nav>
       <div class="mt-user">
         <div class="mt-avatar" id="mt-avatar">M</div>
         <div class="mt-user-info"><span id="mt-username">-</span><small id="mt-userrole">-</small></div>
-        <button class="mt-icon-btn" id="mt-close" title="Schliessen">&times;</button>
+        <button class="mt-icon-btn" id="mt-close" title="Schließen">&times;</button>
       </div>
     </aside>
     <main class="mt-main">
@@ -55,7 +55,7 @@
     <div class="mt-ins-card">
       <header class="mt-ins-head">
         <div><h1>Krankenversicherung</h1><small id="mt-ins-server">SunLife Roleplay</small></div>
-        <button class="mt-icon-btn" id="mt-ins-close" title="Schliessen">&times;</button>
+        <button class="mt-icon-btn" id="mt-ins-close" title="Schließen">&times;</button>
       </header>
       <div id="mt-ins-body" class="mt-ins-body"></div>
     </div>
@@ -69,8 +69,8 @@
   const money = v => Math.floor(Number(v) || 0);
 
   // --- Beispiel-Datenbestand ---
-  const BRANDING = { serverName:'SunLife Roleplay', clinicName:'SunLife Medical Center',
-    logo:'assets/logo.svg', theme:'dark', colorPrimary:'#e11d48', colorAccent:'#f59e0b', colorBg:'#0b0f19' };
+  const BRANDING = { serverName:'SunLife Roleplay', clinicName:'Los Santos Medical Department',
+    logo:'assets/logo.svg', theme:'dark', colorPrimary:'#b3202e', colorAccent:'#c79a3a', colorBg:'#0e141c' };
   const FEATURES = { tabletEnabled:true, dashboard:true, patientSearch:true, treatments:true,
     invoicing:true, pricelist:true, insurance:true, insuranceNPC:true, staffOverview:true, auditLog:true, settings:true };
   const PERMS = { 'admin.full': true }; // volle Rechte -> alle Ansichten sichtbar
@@ -84,7 +84,7 @@
     { id:1, code:'EXAM01', label:'Erstuntersuchung', description:'Aufnahme & Diagnostik', category_id:1, price:250, active:1, required_perm:'' },
     { id:2, code:'TREAT01', label:'Allgemeine Behandlung', description:'Standardbehandlung', category_id:2, price:400, active:1, required_perm:'' },
     { id:3, code:'WOUND01', label:'Wundversorgung', description:'Reinigung, Naht, Verband', category_id:2, price:350, active:1, required_perm:'' },
-    { id:4, code:'XRAY01', label:'Roentgenuntersuchung', description:'Bildgebung', category_id:1, price:600, active:1, required_perm:'' },
+    { id:4, code:'XRAY01', label:'Röntgenuntersuchung', description:'Bildgebung', category_id:1, price:600, active:1, required_perm:'' },
     { id:5, code:'SURG01', label:'Operation', description:'Operativer Eingriff', category_id:3, price:3500, active:1, required_perm:'' },
     { id:6, code:'CPR01', label:'Wiederbelebung', description:'Reanimation', category_id:3, price:2500, active:0, required_perm:'' },
   ];
@@ -179,7 +179,7 @@
           { id:3, created_at:'2026-07-13 04:00', actor_name:'System', actor_identifier:'SYSTEM', category:'insurance', action:'insurance.charge.paid', target_type:'insurance', target_id:'char1:license:2b1c9', result:'ok' },
         ], total:3, page:1, pageSize:25 };
       case 'settings.get':
-        return { branding:BRANDING, features:FEATURES, notice:{ text:'Willkommen im SunLife Medical Center – Schicht 2 aktiv.' },
+        return { branding:BRANDING, features:FEATURES, notice:{ text:'Willkommen beim LSMD – Schicht 2 aktiv.' },
                  panel:{ enabled:false, apiUrl:'https://panel.example.com/api/medictablet', lastSync:[] } };
       case 'settings.save': return { ok:true, message:'Gespeichert.' };
       case 'perms.setOverride': return { ok:true };
@@ -194,7 +194,7 @@
       todayTreatments:7, todayInvoices:4,
       openTreatments:[ { id:102, treatment_no:'BH-20260714-011', staff_name:'Dr. Jane Doe', diagnosis:'Kontrolle', status:'ongoing', created_at:'2026-07-14 16:05' } ],
       recentPatients:[ { identifier:RECORD.identifier, firstname:'Max', lastname:'Mustermann', last_treatment_at:'2026-07-13 09:20', updated_at:'2026-07-13 09:25' } ],
-      notice:{ text:'Willkommen im SunLife Medical Center – Schicht 2 aktiv.' }
+      notice:{ text:'Willkommen beim LSMD – Schicht 2 aktiv.' }
     };
   }
 

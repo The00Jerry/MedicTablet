@@ -55,7 +55,7 @@
     box.innerHTML = `<h2>${esc(title)}</h2><div id="mt-modal-content">${bodyHtml}</div>
       <div class="mt-modal-actions" id="mt-modal-actions"></div>`;
     const act = $('#mt-modal-actions');
-    (actions || [{ label: 'Schliessen', cls: 'ghost', fn: closeModal }]).forEach(a => {
+    (actions || [{ label: 'Schließen', cls: 'ghost', fn: closeModal }]).forEach(a => {
       const b = el('button', 'mt-btn ' + (a.cls || ''), esc(a.label));
       b.onclick = () => a.fn && a.fn();
       act.appendChild(b);
@@ -67,7 +67,7 @@
   function confirmDialog(title, html, onYes, yesLabel) {
     modal(title, html, [
       { label: 'Abbrechen', cls: 'ghost', fn: closeModal },
-      { label: yesLabel || 'Bestaetigen', cls: 'primary', fn: () => { closeModal(); onYes(); } }
+      { label: yesLabel || 'Bestätigen', cls: 'primary', fn: () => { closeModal(); onYes(); } }
     ]);
   }
 
@@ -90,7 +90,7 @@
     { id: 'dashboard', label: 'Dashboard', ico: '▤', feature: 'dashboard' },
     { id: 'search', label: 'Patienten', ico: '⚇', perm: 'patient.search', feature: 'patientSearch' },
     { id: 'pricelist', label: 'Preisliste', ico: '≣', perm: 'pricelist.view', feature: 'pricelist' },
-    { id: 'insurance', label: 'Versicherung', ico: '❤', perm: 'insurance.patient.view', feature: 'insurance' },
+    { id: 'insurance', label: 'Versicherung', ico: '◆', perm: 'insurance.patient.view', feature: 'insurance' },
     { id: 'staff', label: 'Mitarbeiter', ico: '☰', perm: 'staff.view', feature: 'staffOverview' },
     { id: 'logs', label: 'Protokolle', ico: '☷', perm: 'audit.view', feature: 'auditLog' },
     { id: 'settings', label: 'Einstellungen', ico: '⚙', perm: 'settings.edit', feature: 'settings' }
@@ -131,7 +131,7 @@
         ${statCard('Rechnungen heute', d.todayInvoices || 0, '$')}
         ${statCard('Offene Behandlungen', (d.openTreatments || []).length, '◷')}
       </div>
-      ${(d.notice && d.notice.text) ? `<div class="mt-brk-note mt-mb">📌 ${esc(d.notice.text)}</div>` : ''}
+      ${(d.notice && d.notice.text) ? `<div class="mt-brk-note mt-mb">${esc(d.notice.text)}</div>` : ''}
       <div class="mt-grid mt-cols-2">
         <div class="mt-card"><h3>Im Dienst</h3>${listOrEmpty((d.onDuty || []).map(m => `<div class="mt-kv"><span>${esc(m.name)}</span><span>${esc(m.grade_label || '')}</span></div>`))}</div>
         <div class="mt-card"><h3>Zuletzt bearbeitete Akten</h3>${listOrEmpty((d.recentPatients || []).map(p => `<div class="mt-kv" data-open="${esc(p.identifier)}" style="cursor:pointer"><span>${esc(p.firstname)} ${esc(p.lastname)}</span><span>${fmtDate(p.last_treatment_at)}</span></div>`))}</div>
@@ -184,7 +184,7 @@
     $('#s-results').innerHTML = `<div class="mt-list">${rows.map(p => `
       <div class="mt-list-item" data-id="${esc(p.identifier)}">
         <div><strong>${esc(p.firstname)} ${esc(p.lastname)}</strong>
-          <div class="meta">${p.dob ? '🎂 ' + esc(p.dob) + ' · ' : ''}${p.phone ? '📞 ' + esc(p.phone) + ' · ' : ''}${p.record_id ? 'Akte vorhanden' : 'Neue Akte'}</div>
+          <div class="meta">${p.dob ? 'geb. ' + esc(p.dob) + ' · ' : ''}${p.phone ? 'Tel. ' + esc(p.phone) + ' · ' : ''}${p.record_id ? 'Akte vorhanden' : 'Neue Akte'}</div>
         </div><span class="mt-btn ghost">Öffnen →</span>
       </div>`).join('')}</div>${pager(searchState, doSearch)}`;
     $('#s-results').querySelectorAll('[data-id]').forEach(x => x.onclick = () => openRecord(x.getAttribute('data-id')));
@@ -331,7 +331,7 @@
         <div class="mt-brk-row"><span class="disc">Rabatt</span><span class="disc">− ${money(t.amount_discount)}</span></div>
         <div class="mt-brk-row total"><span>Endbetrag</span><span>${money(t.amount_final)}</span></div>
       </div>`,
-      [{ label: 'Schliessen', cls: 'ghost', fn: closeModal },
+      [{ label: 'Schließen', cls: 'ghost', fn: closeModal },
        can('invoice.create') && t.status !== 'cancelled' ? { label: 'Rechnung erstellen', cls: 'primary', fn: () => { closeModal(); openInvoiceForm(t.id); } } : null].filter(Boolean));
   }
 
@@ -427,7 +427,7 @@
       : '';
     const note = d.insurance_key
       ? (d.coverable
-        ? `<div class="mt-brk-note">🛡 Der Patient zahlt weniger, weil die <strong>${esc(d.insurance_name)}</strong> ${esc(d.insurance_pct)}% übernimmt (${money(d.insurance_covered)}). Der Versicherungsanteil ist KEIN Rabatt.</div>`
+        ? `<div class="mt-brk-note">Der Patient zahlt weniger, weil die <strong>${esc(d.insurance_name)}</strong> ${esc(d.insurance_pct)} % übernimmt (${money(d.insurance_covered)}). Der Versicherungsanteil ist KEIN Rabatt.</div>`
         : `<div class="mt-brk-warn">⚠ Versicherung "${esc(d.insurance_name)}" vorhanden, aber keine Übernahme: ${esc(REASONS[d.reason_key] || d.reason_key)}.</div>`)
       : '<div class="mt-brk-warn">Keine aktive Versicherung – voller Betrag.</div>';
     $('#i-breakdown').innerHTML = `<div class="mt-breakdown">

@@ -24,9 +24,9 @@ Config.PricelistSeed.Items = {
     { code = 'TREAT01', label = 'Allgemeine Behandlung',category = 'treatment',   price = 400,   perm = '',                desc = 'Standardbehandlung' },
     { code = 'WOUND01', label = 'Wundversorgung',       category = 'treatment',   price = 350,   perm = '',                desc = 'Reinigung, Naht, Verband' },
     { code = 'MED01',   label = 'Medikamentengabe',     category = 'treatment',   price = 150,   perm = '',                desc = 'Verabreichung von Medikamenten' },
-    { code = 'XRAY01',  label = 'Roentgenuntersuchung', category = 'diagnostics', price = 600,   perm = '',                desc = 'Bildgebende Diagnostik' },
+    { code = 'XRAY01',  label = 'Röntgenuntersuchung', category = 'diagnostics', price = 600,   perm = '',                desc = 'Bildgebende Diagnostik' },
     { code = 'SURG01',  label = 'Operation',            category = 'surgery',     price = 3500,  perm = 'treatment.edit',  desc = 'Operativer Eingriff' },
     { code = 'CPR01',   label = 'Wiederbelebung',       category = 'surgery',     price = 2500,  perm = '',                desc = 'Reanimation' },
     { code = 'TRANS01', label = 'Krankentransport',     category = 'transport',   price = 500,   perm = '',                desc = 'Transport zum Krankenhaus' },
-    { code = 'STAT01',  label = 'Stationaere Aufnahme', category = 'stationary',  price = 1200,  perm = '',                desc = 'Aufnahme zur Beobachtung' },
+    { code = 'STAT01',  label = 'Stationäre Aufnahme', category = 'stationary',  price = 1200,  perm = '',                desc = 'Aufnahme zur Beobachtung' },
 }

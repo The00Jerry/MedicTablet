@@ -17,7 +17,7 @@ Config.Insurance.TiersSeed = {
     {
         tier_key       = 'basic',
         label          = 'Basisversicherung',
-        description    = 'Grundschutz fuer die wichtigsten Behandlungen.',
+        description    = 'Grundschutz für die wichtigsten Behandlungen.',
         color          = '#38bdf8',
         icon           = 'shield',
         weekly_premium = 500,   -- woechentlicher Beitrag ($)
@@ -32,7 +32,7 @@ Config.Insurance.TiersSeed = {
     {
         tier_key       = 'comfort',
         label          = 'Komfortversicherung',
-        description    = 'Erweiterter Schutz mit hoeherer Kostenuebernahme.',
+        description    = 'Erweiterter Schutz mit höherer Kostenübernahme.',
         color          = '#34d399',
         icon           = 'shield-check',
         weekly_premium = 1200,
@@ -47,7 +47,7 @@ Config.Insurance.TiersSeed = {
     {
         tier_key       = 'premium',
         label          = 'Premiumversicherung',
-        description    = 'Rundum-Schutz mit maximaler Kostenuebernahme.',
+        description    = 'Rundum-Schutz mit maximaler Kostenübernahme.',
         color          = '#f59e0b',
         icon           = 'crown',
         weekly_premium = 2500,

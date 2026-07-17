@@ -11,7 +11,7 @@
   const fmtDate = (s) => { if (!s) return '-'; const d = new Date(s); return isNaN(d) ? esc(String(s).slice(0, 16)) : d.toLocaleString('de-DE', { dateStyle: 'short', timeStyle: 'short' }); };
 
   const ERR = {
-    no_permission: 'Fehlende Berechtigung.', invalid_input: 'Ungueltige Eingabe.', invalid_amount: 'Ungueltiger Betrag.',
+    no_permission: 'Fehlende Berechtigung.', invalid_input: 'Ungültige Eingabe.', invalid_amount: 'Ungültiger Betrag.',
     player_not_found: 'Spieler/Charakter nicht gefunden.', invoice_duplicate: 'Rechnung existiert bereits.',
     ins_none: 'Keine aktive Versicherung', ins_waiting: 'In Wartezeit', ins_paused: 'Pausiert',
     ins_charge_failed: 'Wochenbeitrag nicht bezahlt', ok: 'aktiv', not_found: 'Nicht gefunden.',
@@ -42,12 +42,12 @@
   function modal(title, body, actions) {
     const box = $('#mt-modal-box');
     box.innerHTML = `<h2>${esc(title)}</h2><div id="mt-modal-content">${body}</div><div class="mt-modal-actions" id="mt-modal-actions"></div>`;
-    (actions || [{ label: 'Schliessen', cls: 'ghost', fn: closeModal }]).forEach(a => { const b = el('button', 'mt-btn ' + (a.cls || ''), esc(a.label)); b.onclick = () => a.fn && a.fn(); $('#mt-modal-actions').appendChild(b); });
+    (actions || [{ label: 'Schließen', cls: 'ghost', fn: closeModal }]).forEach(a => { const b = el('button', 'mt-btn ' + (a.cls || ''), esc(a.label)); b.onclick = () => a.fn && a.fn(); $('#mt-modal-actions').appendChild(b); });
     $('#mt-modal').classList.remove('mt-hidden'); return box;
   }
   const closeModal = () => $('#mt-modal').classList.add('mt-hidden');
   function confirmDialog(title, html, onYes, yesLabel) {
-    modal(title, html, [{ label: 'Abbrechen', cls: 'ghost', fn: closeModal }, { label: yesLabel || 'Bestaetigen', cls: 'primary', fn: () => { closeModal(); onYes(); } }]);
+    modal(title, html, [{ label: 'Abbrechen', cls: 'ghost', fn: closeModal }, { label: yesLabel || 'Bestätigen', cls: 'primary', fn: () => { closeModal(); onYes(); } }]);
   }
 
   // ---- Branding / Nav ----
@@ -63,7 +63,7 @@
     { id: 'dashboard', label: 'Dashboard', ico: '▤', perm: 'tablet.open' },
     { id: 'search', label: 'Patienten', ico: '⚇', perm: 'patient.search' },
     { id: 'pricelist', label: 'Preisliste', ico: '≣', perm: 'pricelist.view' },
-    { id: 'insurance', label: 'Versicherung', ico: '❤', perm: 'insurance.patient.view' },
+    { id: 'insurance', label: 'Versicherung', ico: '◆', perm: 'insurance.patient.view' },
     { id: 'staff', label: 'Mitarbeiter', ico: '☰', perm: 'staff.view' },
     { id: 'logs', label: 'Protokolle', ico: '☷', perm: 'audit.view' },
   ];
@@ -138,7 +138,7 @@
     if (!r.ok) return ($('#s-results').innerHTML = `<div class="mt-brk-warn">${esc(errText(r))}</div>`);
     searchState.total = r.data.total || 0; const rows = r.data.results || [];
     if (!rows.length) { $('#s-results').innerHTML = '<div class="mt-empty">Keine Treffer.</div>'; return; }
-    $('#s-results').innerHTML = `<div class="mt-list">${rows.map(p => `<div class="mt-list-item" data-id="${esc(p.identifier)}"><div><strong>${esc(p.firstname)} ${esc(p.lastname)}</strong><div class="meta">${p.dob ? '🎂 ' + esc(p.dob) + ' · ' : ''}${p.phone ? '📞 ' + esc(p.phone) + ' · ' : ''}${p.record_id ? 'Akte vorhanden' : 'Neue Akte'}</div></div><span class="mt-btn ghost">Öffnen →</span></div>`).join('')}</div>${pager(searchState, doSearch)}`;
+    $('#s-results').innerHTML = `<div class="mt-list">${rows.map(p => `<div class="mt-list-item" data-id="${esc(p.identifier)}"><div><strong>${esc(p.firstname)} ${esc(p.lastname)}</strong><div class="meta">${p.dob ? 'geb. ' + esc(p.dob) + ' · ' : ''}${p.phone ? 'Tel. ' + esc(p.phone) + ' · ' : ''}${p.record_id ? 'Akte vorhanden' : 'Neue Akte'}</div></div><span class="mt-btn ghost">Öffnen →</span></div>`).join('')}</div>${pager(searchState, doSearch)}`;
     $('#s-results').querySelectorAll('[data-id]').forEach(x => x.onclick = () => openRecord(x.getAttribute('data-id')));
   }
 
@@ -237,7 +237,7 @@
       ${t.internal_note ? `<div class="mt-mt"><label>Interne Notiz</label>${esc(t.internal_note)}</div>` : ''}
       <div class="mt-mt">${tableWrap(['Leistung', 'Einzel', 'Menge', 'Summe'], items.map(i => `<tr><td>${esc(i.label)}</td><td class="r">${money(i.unit_price)}</td><td class="r">${i.quantity}</td><td class="r">${money(i.line_total)}</td></tr>`))}</div>
       <div class="mt-breakdown mt-mt"><div class="mt-brk-row"><span>Basis</span><span>${money(t.amount_base)}</span></div><div class="mt-brk-row"><span class="ins">Versicherung</span><span class="ins">− ${money(t.amount_insurance)}</span></div><div class="mt-brk-row"><span class="disc">Rabatt</span><span class="disc">− ${money(t.amount_discount)}</span></div><div class="mt-brk-row total"><span>Endbetrag</span><span>${money(t.amount_final)}</span></div></div>`,
-      [{ label: 'Schliessen', cls: 'ghost', fn: closeModal }, can('invoice.create') && t.status !== 'cancelled' ? { label: 'Rechnung erstellen', cls: 'primary', fn: () => { closeModal(); openInvoiceForm(t.id); } } : null].filter(Boolean));
+      [{ label: 'Schließen', cls: 'ghost', fn: closeModal }, can('invoice.create') && t.status !== 'cancelled' ? { label: 'Rechnung erstellen', cls: 'primary', fn: () => { closeModal(); openInvoiceForm(t.id); } } : null].filter(Boolean));
   }
 
   // ---- New treatment ----
@@ -296,7 +296,7 @@
     if (!r.ok) return ($('#i-breakdown').innerHTML = `<div class="mt-brk-warn">${esc(errText(r))}</div>`);
     const d = r.data.display;
     const insLine = d.insurance_covered > 0 ? `<div class="mt-brk-row"><span class="ins">Versicherung (${esc(d.insurance_name)}, ${esc(d.insurance_pct)}%)</span><span class="ins">− ${money(d.insurance_covered)}</span></div>` : '';
-    const note = d.insurance_key ? (d.coverable ? `<div class="mt-brk-note">🛡 Patient zahlt weniger: <strong>${esc(d.insurance_name)}</strong> übernimmt ${esc(d.insurance_pct)}% (${money(d.insurance_covered)}). Kein Rabatt.</div>` : `<div class="mt-brk-warn">⚠ Versicherung "${esc(d.insurance_name)}" ohne Übernahme: ${esc(REASONS[d.reason_key] || d.reason_key)}.</div>`) : '<div class="mt-brk-warn">Keine aktive Versicherung – voller Betrag.</div>';
+    const note = d.insurance_key ? (d.coverable ? `<div class="mt-brk-note">Patient zahlt weniger: <strong>${esc(d.insurance_name)}</strong> übernimmt ${esc(d.insurance_pct)}% (${money(d.insurance_covered)}). Kein Rabatt.</div>` : `<div class="mt-brk-warn">⚠ Versicherung "${esc(d.insurance_name)}" ohne Übernahme: ${esc(REASONS[d.reason_key] || d.reason_key)}.</div>`) : '<div class="mt-brk-warn">Keine aktive Versicherung – voller Betrag.</div>';
     $('#i-breakdown').innerHTML = `<div class="mt-breakdown">
       <div class="mt-brk-row"><span>Ursprünglicher Rechnungsbetrag</span><span>${money(d.amount_base)}</span></div>${insLine}
       ${d.discount > 0 ? `<div class="mt-brk-row"><span class="disc">Zusätzlicher Rabatt</span><span class="disc">− ${money(d.discount)}</span></div>` : ''}

@@ -7,10 +7,10 @@ MT.Locales['de'] = {
     -- allgemein
     ['no_permission']       = 'Fehlende Berechtigung.',
     ['tablet_disabled']     = 'Das Medic-Tablet ist derzeit deaktiviert.',
-    ['not_allowed_job']     = 'Dein Job ist fuer das Tablet nicht freigeschaltet.',
+    ['not_allowed_job']     = 'Dein Job ist für das Tablet nicht freigeschaltet.',
     ['user_locked']         = 'Dein Zugriff auf das Tablet wurde gesperrt.',
     ['rate_limited']        = 'Zu viele Anfragen. Bitte kurz warten.',
-    ['invalid_input']       = 'Ungueltige Eingabe.',
+    ['invalid_input']       = 'Ungültige Eingabe.',
     ['db_error']            = 'Datenbankfehler. Bitte an die Leitung wenden.',
     ['not_on_duty']         = 'Du bist nicht im Dienst.',
 
@@ -19,8 +19,8 @@ MT.Locales['de'] = {
     ['player_not_found']    = 'Spieler oder Charakter nicht gefunden.',
     ['billing_down']        = 'Das Rechnungssystem (CodeM Billing V2) ist nicht gestartet.',
     ['invoice_failed']      = 'Rechnung konnte nicht erstellt werden.',
-    ['invalid_amount']      = 'Ungueltiger Rechnungsbetrag.',
-    ['invoice_duplicate']   = 'Diese Rechnung wurde moeglicherweise bereits erstellt.',
+    ['invalid_amount']      = 'Ungültiger Rechnungsbetrag.',
+    ['invoice_duplicate']   = 'Diese Rechnung wurde möglicherweise bereits erstellt.',
     ['invoice_ok']          = 'Rechnung erfolgreich erstellt.',
     ['invoice_cancelled']   = 'Rechnung storniert.',
 
@@ -30,7 +30,7 @@ MT.Locales['de'] = {
     ['ins_paused']          = 'Versicherung ist pausiert.',
     ['ins_subscribed']      = 'Versicherung erfolgreich abgeschlossen.',
     ['ins_switched']        = 'Versicherung gewechselt.',
-    ['ins_cancelled']       = 'Versicherung gekuendigt.',
+    ['ins_cancelled']       = 'Versicherung gekündigt.',
     ['ins_min_term']        = 'Mindestlaufzeit noch nicht erreicht.',
     ['ins_charge_ok']       = 'Versicherungsbeitrag abgebucht.',
     ['ins_charge_failed']   = 'Beitrag konnte nicht abgebucht werden (kein Guthaben).',
