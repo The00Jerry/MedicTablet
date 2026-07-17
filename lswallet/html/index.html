@@ -1,0 +1,42 @@
+<div id="wl-root" class="wl-hidden">
+  <div id="wl-toasts"></div>
+
+  <!-- Wallet-Modus -->
+  <div id="wl-wallet" class="wl-wallet wl-hidden">
+    <header class="wl-wallet-head">
+      <span>My Wallet</span>
+      <button class="wl-x" id="wl-close-wallet">&times;</button>
+    </header>
+    <div id="wl-wallet-body" class="wl-wallet-body"></div>
+    <footer id="wl-wallet-foot" class="wl-wallet-foot"></footer>
+  </div>
+
+  <!-- DMV-Schalter -->
+  <div id="wl-dmv" class="wl-dmv wl-hidden">
+    <div class="wl-dmv-card">
+      <header class="wl-dmv-head">
+        <img class="wl-dmv-logo" id="wl-dmv-logo" src="assets/logo.svg" alt="DOL"/>
+        <div><div class="wl-dmv-title" id="wl-city">CITY OF LOS SANTOS</div><div class="wl-dmv-sub" id="wl-dept">Department Of Licensing &amp; Identification</div></div>
+        <button class="wl-x" id="wl-close-dmv">&times;</button>
+      </header>
+      <div class="wl-dmv-welcome" id="wl-welcome"></div>
+      <div id="wl-dmv-body" class="wl-dmv-body"></div>
+    </div>
+  </div>
+
+  <!-- Karten-Viewer -->
+  <div id="wl-viewer" class="wl-viewer wl-hidden"><div id="wl-viewer-inner"></div></div>
+
+  <!-- Admin Control Center -->
+  <div id="wl-admin" class="wl-admin wl-hidden">
+    <div class="wl-admin-card">
+      <header class="wl-admin-head"><span>Admin Wallet Control Center</span><button class="wl-x" id="wl-close-admin">&times;</button></header>
+      <nav class="wl-admin-tabs" id="wl-admin-tabs"></nav>
+      <div id="wl-admin-body" class="wl-admin-body"></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="wl-modal" class="wl-modal-overlay wl-hidden"><div class="wl-modal" id="wl-modal-box"></div></div>
+</div>
+<script src="app.js"></script>

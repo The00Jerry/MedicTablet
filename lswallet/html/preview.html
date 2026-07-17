@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>DOL Wallet – Vorschau (Mock)</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  html,body{background:radial-gradient(circle at 70% 30%,#1a2a22,#070b09)!important}
+  #wp-bar{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;gap:8px;background:#0c0f13cc;border:1px solid #2a323d;border-radius:10px;padding:8px 10px;font-family:Segoe UI,system-ui,sans-serif}
+  #wp-bar button{background:#1b2028;color:#e8ecf1;border:1px solid #2a323d;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12.5px}
+  #wp-bar button:hover{border-color:#c9a94a}
+  #wp-bar .tag{color:#8b95a3;font-size:11px;align-self:center;margin-right:4px}
+</style>
+</head>
+<body>
+<div id="wp-bar"><span class="tag">Vorschau (Mock):</span><button onclick="WP.open('wallet')">Wallet</button><button onclick="WP.open('dmv')">DMV-Schalter</button><button onclick="location.reload()">⟳ Reset</button></div>
+
+<div id="wl-root" class="wl-hidden">
+  <div id="wl-toasts"></div>
+  <div id="wl-wallet" class="wl-wallet wl-hidden"><header class="wl-wallet-head"><span>My Wallet</span><button class="wl-x" id="wl-close-wallet">&times;</button></header><div id="wl-wallet-body" class="wl-wallet-body"></div><footer id="wl-wallet-foot" class="wl-wallet-foot"></footer></div>
+  <div id="wl-dmv" class="wl-dmv wl-hidden"><div class="wl-dmv-card"><header class="wl-dmv-head"><img class="wl-dmv-logo" id="wl-dmv-logo" src="assets/logo.svg" alt="DOL"/><div><div class="wl-dmv-title" id="wl-city">CITY OF LOS SANTOS</div><div class="wl-dmv-sub" id="wl-dept">Department Of Licensing &amp; Identification</div></div><button class="wl-x" id="wl-close-dmv">&times;</button></header><div class="wl-dmv-welcome" id="wl-welcome"></div><div id="wl-dmv-body" class="wl-dmv-body"></div></div></div>
+  <div id="wl-viewer" class="wl-viewer wl-hidden"><div id="wl-viewer-inner"></div></div>
+  <div id="wl-admin" class="wl-admin wl-hidden"><div class="wl-admin-card"><header class="wl-admin-head"><span>Admin Wallet Control Center</span><button class="wl-x" id="wl-close-admin">&times;</button></header><nav class="wl-admin-tabs" id="wl-admin-tabs"></nav><div id="wl-admin-body" class="wl-admin-body"></div></div></div>
+  <div id="wl-modal" class="wl-modal-overlay wl-hidden"><div class="wl-modal" id="wl-modal-box"></div></div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const BRANDING = { cityName:'City of Los Santos', deptName:'Department of Licensing & Identification', shortName:'DOL', serverName:'SunLife Roleplay', logo:'assets/logo.svg', theme:'dark', colorPrimary:'#2f6f4f', colorAccent:'#c9a94a', colorBg:'#0c0f13' };
+  const IDENT = { name:'Elijah Kentucky', firstname:'Elijah', lastname:'Kentucky', dateofbirth:'29.02.1992', sex:'M', phone:'555-2130', identifier:'char1:license:elk', job:'police', grade:2 };
+  const WALLET = {
+    cards:[
+      { ctype:'job_wallet', title:'LSPD', header:'POLICE', color:'#2b4c8c', dept:'Los Santos Police Dept.', serial:'BADGE-2', data:{firstname:'Elijah',lastname:'Kentucky',rank:'2',dept:'Los Santos Police Dept.'} },
+      { id:1, ctype:'national_id', title:'Personalausweis', serial:'USLSC2139312', issued_at:'2024-08-12', expires_at:null, data:{firstname:'Elijah',lastname:'Kentucky',dateofbirth:'29.02.1992',sex:'M',address:'4c, 69 Los Santos'} },
+      { id:3, ctype:'business_card', title:'Kentucky Consulting', serial:'BC5521', data:{firstname:'Elijah',lastname:'Kentucky',company:'Kentucky Consulting',role:'CEO',phone:'555-2130',email:'elk@ls.io',slogan:'We deliver.'} },
+    ],
+    licenses:[
+      { id:2, ctype:'driver_license', title:'Führerschein', serial:'LSDL77120', issued_at:'2024-08-12', expires_at:'2028-07-27', data:{firstname:'Elijah',lastname:'Kentucky',dateofbirth:'29.02.1992',class:'B'} },
+    ],
+    tickets:[
+      { id:4, ctype:'ticket', title:'LJ’s Private Party', serial:'TK9931', data:{event:'LJ’s Private Party',date:'September 4, 23:00',seat:'Unit One'} },
+    ],
+  };
+  const APPS = [ { id:1, identifier:'char1:license:xx', applicant_name:'Mary Jones', atype:'driver_license', payload:{class:'B'}, status:'pending', created_at:'2026-07-16 12:00' } ];
+
+  function route(action, data){
+    data = data || {};
+    switch(action){
+      case 'wallet.get': return { branding:BRANDING, identity:IDENT, wallet:WALLET, pending:[], isAdmin:true, perms:{'admin.full':true},
+        dmv:{ classes:['B','BE','C','A'], tickets:[ {key:'event_ticket',type:'ticket',label:'Event-Ticket',fields:['event','date','seat']}, {key:'discount_coupon',type:'coupon',label:'Rabatt-Coupon',fields:['shop','discount','valid_until']} ] },
+        fees:{ id:250, driver:500, business:150 } };
+      case 'dmv.getId': return {ok:true,id:9,message:'Personalausweis ausgestellt.'};
+      case 'dmv.applyDriver': return {ok:true,id:9,message:'Antrag eingereicht. Ein Mitarbeiter prüft ihn.'};
+      case 'dmv.businessCard': return {ok:true,id:9,message:'Karte ausgestellt.'};
+      case 'tickets.print': return {ok:true,id:9,message:'Ticket/Coupon gedruckt.'};
+      case 'admin.lookup': return { found:true, identity:IDENT, cards:WALLET.cards.concat(WALLET.licenses).filter(c=>c.id), canRevoke:true, canIssue:true };
+      case 'admin.applications': return { applications:APPS };
+      case 'admin.decideApplication': return {ok:true,message:'Antrag bearbeitet.'};
+      case 'admin.templates': return { templates:[ {tkey:'national_id',ctype:'national_id',label:'Personalausweis'}, {tkey:'driver_license',ctype:'driver_license',label:'Führerschein'}, {tkey:'business_card',ctype:'business_card',label:'Visitenkarte'} ] };
+      case 'admin.revoke': return {ok:true,message:'Karte entzogen.'};
+      case 'admin.issue': return {ok:true,message:'Karte ausgestellt.'};
+      default: return {ok:true};
+    }
+  }
+  const realFetch = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function(url, opts){
+    const u = String(url);
+    if (u.indexOf('lswallet/') !== -1){
+      let body={}; try{ body = JSON.parse((opts&&opts.body)||'{}'); }catch(e){}
+      if (u.endsWith('/close')) { document.getElementById('wl-root').classList.add('wl-hidden'); return Promise.resolve({ json:()=>Promise.resolve({ok:true}) }); }
+      return Promise.resolve({ json:()=>Promise.resolve({ ok:true, data: route(body.action, body.data) }) });
+    }
+    return realFetch ? realFetch(url, opts) : Promise.reject('no fetch');
+  };
+  window.WP = { open:function(mode){ window.postMessage({ type:'open', mode:mode, payload: route('wallet.get',{}) }, '*'); } };
+  const s = document.createElement('script'); s.src='app.js'; s.onload=function(){ setTimeout(function(){ WP.open('wallet'); }, 60); }; document.body.appendChild(s);
+})();
+</script>
+</body>
+</html>
