@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>LSPD MDT – Browser-Vorschau (Mock)</title>
+<link rel="stylesheet" href="style.css"/>
+<style>
+  html,body{background:radial-gradient(circle at 30% 15%,#16233d,#070b13)!important}
+  #mtp-bar{position:fixed;top:10px;left:10px;z-index:9999;display:flex;gap:8px;background:#0d131ccc;border:1px solid #293546;border-radius:10px;padding:8px 10px;font-family:Segoe UI,system-ui,sans-serif}
+  #mtp-bar button{background:#1d2736;color:#e6ebf2;border:1px solid #293546;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:12.5px}
+  #mtp-bar button:hover{border-color:#2b4c8c}
+  #mtp-bar .tag{color:#93a0b3;font-size:11px;align-self:center;margin-right:4px}
+</style>
+</head>
+<body>
+<div id="mtp-bar"><span class="tag">Vorschau (Mock):</span><button onclick="location.reload()">⟳ Reset</button></div>
+
+<div id="mt-root" class="mt-hidden">
+  <div id="mt-toasts"></div>
+  <div id="mt-modal" class="mt-modal-overlay mt-hidden"><div class="mt-modal" id="mt-modal-box"></div></div>
+  <div id="fp-overlay" class="fp-scan mt-hidden"><div class="fp-box"><div class="fp-ring">☝</div><h2>Fingerabdruck-Scan…</h2><small>Person wird identifiziert</small></div></div>
+  <div id="mt-tablet" class="mt-app mt-hidden">
+    <aside class="mt-sidebar">
+      <div class="mt-brand"><img id="mt-logo" src="assets/logo.svg" alt="LSPD"/><div class="mt-brand-text"><span id="mt-dept">Los Santos Police Dept.</span><small id="mt-server">SunLife Roleplay</small></div></div>
+      <nav id="mt-nav" class="mt-nav"></nav>
+      <div class="mt-user"><div class="mt-avatar" id="mt-avatar">O</div><div class="mt-user-info"><span id="mt-username">-</span><small id="mt-userrole">-</small></div><button class="mt-icon-btn" id="mt-close" title="Schließen">&times;</button></div>
+    </aside>
+    <main class="mt-main"><header class="mt-topbar"><h1 id="mt-view-title">Dashboard</h1><div class="mt-top-actions" id="mt-top-actions"></div></header><section id="mt-content" class="mt-content"></section></main>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  const BRANDING = { serverName:'SunLife Roleplay', deptName:'Los Santos Police Department', shortName:'LSPD', logo:'assets/logo.svg', theme:'dark', colorPrimary:'#2b4c8c', colorAccent:'#c8a24a', colorBg:'#0d131c' };
+  const FEATURES = { tabletEnabled:true, dashboard:true, citizenSearch:true, fingerprint:true, wanted:true, penalcode:true, citations:true, reports:true, vehicles:true, staffOverview:true, auditLog:true, settings:true };
+  const PERMS = { 'admin.full': true };
+  const CATS = [ {id:1,cat_key:'traffic',label:'Verkehr',sort:10},{id:2,cat_key:'property',label:'Eigentumsdelikte',sort:20},{id:3,cat_key:'violence',label:'Gewaltdelikte',sort:30} ];
+  const OFFS = [
+    {id:1,code:'V01',label:'Geschwindigkeitsübertretung',description:'Zu schnelles Fahren',category_id:1,fine:250,jail:0,points:1,active:1,required_perm:''},
+    {id:2,code:'E03',label:'Fahrzeugdiebstahl (GTA)',description:'',category_id:2,fine:3000,jail:10,points:0,active:1,required_perm:''},
+    {id:3,code:'G03',label:'Bewaffneter Raub',description:'',category_id:3,fine:8000,jail:25,points:0,active:1,required_perm:''},
+  ];
+  const REC = {
+    record:{ id:7, identifier:'char1:license:9f2a1', firstname:'John', lastname:'Vercetti', dateofbirth:'1989-02-11', sex:'m', phone:'0177-2231', fingerprint:'FP-7A3C91DE', mugshot_url:'', licenses:{driver:true,weapon:false}, is_wanted:1, notes:'Bekannt aus mehreren Verkehrskontrollen.' },
+    wanted:[ {id:1,reason:'Bewaffneter Raub Tankstelle Grove St.',level:'high',officer_name:'Ofc. K. Reyes',status:'active',created_at:'2026-07-15 22:10'} ],
+    charges:[ {id:1,charge_no:'AZ-20260710-0031',reason:'Verkehrskontrolle',fine_total:550,jail_total:1,points_total:2,status:'issued',created_at:'2026-07-10 14:00'} ],
+    reports:[ {id:1,report_no:'CR-20260715-0007',title:'Raubüberfall Tankstelle',type:'investigation',role:'suspect',status:'open',created_at:'2026-07-15 22:30'} ],
+    notes:[ {id:1,author_name:'Ofc. K. Reyes',body:'Verdächtig, flüchtete zu Fuß.',created_at:'2026-07-15 22:31'} ],
+    priors:{ count:1, jail:1 }, canNotes:true, canEdit:true, canLicenses:true
+  };
+  function clone(o){ return JSON.parse(JSON.stringify(o)); }
+
+  function route(action, data){
+    data = data || {};
+    switch(action){
+      case 'tablet.bootstrap': return { identity:{name:'Ofc. K. Reyes',job:'police',grade:4,identifier:'char1:license:cop1'}, branding:BRANDING, features:FEATURES, perms:PERMS, dashboard:dash() };
+      case 'dashboard.data': return { dashboard: dash() };
+      case 'citizens.search': return { results:[ {identifier:REC.record.identifier,firstname:'John',lastname:'Vercetti',dob:'1989-02-11',phone:'0177-2231',record_id:7,is_wanted:1,fingerprint:'FP-7A3C91DE'}, {identifier:'char1:license:55bb',firstname:'Mary',lastname:'Jones',dob:'1995-08-03',phone:'0160-8890',record_id:null,is_wanted:0,fingerprint:'FP-1188AA02'} ], total:2, page:1, pageSize:15 };
+      case 'citizens.open': return clone(REC);
+      case 'citizens.setLicense': { const l = clone(REC.record.licenses); l[data.key]=!!data.value; REC.record.licenses=l; return {ok:true,licenses:l}; }
+      case 'citizens.update': REC.record.notes = data.notes||REC.record.notes; return {ok:true};
+      case 'citizens.addNote': return {ok:true,id:9};
+      case 'wanted.list': return { wanted:[ {id:1,reason:'Bewaffneter Raub',level:'high',officer_name:'Ofc. K. Reyes',created_at:'2026-07-15 22:10',identifier:REC.record.identifier,firstname:'John',lastname:'Vercetti',fingerprint:'FP-7A3C91DE'} ] };
+      case 'wanted.add': return {ok:true,id:5,message:'Zur Fahndung ausgeschrieben.'};
+      case 'wanted.clear': return {ok:true,message:'Fahndung aufgehoben.'};
+      case 'penalcode.list': return { categories:CATS, offenses:OFFS, canEdit:true };
+      case 'penalcode.saveOffense': return {ok:true,id:99};
+      case 'penalcode.toggle': return {ok:true,active:1};
+      case 'penalcode.archive': return {ok:true};
+      case 'penalcode.saveCategory': return {ok:true};
+      case 'citations.preview': { const t = totals(data.items); return { lines:[], totals:t }; }
+      case 'citations.create': return {ok:true,charge_id:9,charge_no:'AZ-NEU-0001',totals:totals(data.items),provider:'esx',message:'Anzeige erstellt.'};
+      case 'citations.cancel': return {ok:true,message:'Anzeige storniert.'};
+      case 'reports.list': return { rows:[ {id:1,report_no:'CR-20260715-0007',title:'Raubüberfall Tankstelle',type:'investigation',officer_name:'Ofc. K. Reyes',status:'open',created_at:'2026-07-15 22:30'} ], total:1, page:1, pageSize:20 };
+      case 'reports.get': return { report:{id:1,report_no:'CR-20260715-0007',title:'Raubüberfall Tankstelle',type:'investigation',officer_name:'Ofc. K. Reyes',body:'Täter flüchtig, Fahndung läuft.',status:'open'}, involved:[{id:1,identifier:REC.record.identifier,name:'John Vercetti',role:'suspect'}], evidence:[{id:1,label:'Überwachungsvideo',description:'Kamera 3'}], canEdit:true, canClose:true };
+      case 'reports.create': return {ok:true,id:2,report_no:'CR-NEU-0001',message:'Bericht gespeichert.'};
+      case 'reports.update': return {ok:true};
+      case 'reports.close': return {ok:true,message:'Bericht geschlossen.'};
+      case 'vehicles.lookup': return { plate:(data.plate||'').toUpperCase(), owner:{identifier:REC.record.identifier,firstname:'John',lastname:'Vercetti',fingerprint:'FP-7A3C91DE',is_wanted:1}, flags:[{id:1,flag:'stolen',reason:'als gestohlen gemeldet',created_at:'2026-07-14 10:00'}], canFlag:true };
+      case 'vehicles.flag': return {ok:true,id:3};
+      case 'vehicles.clearFlag': return {ok:true};
+      case 'staff.overview': return { onDuty:[{name:'Ofc. K. Reyes',grade_label:'Command'},{name:'Ofc. D. Park',grade_label:'Officer'}], activity:[{actor_name:'Ofc. K. Reyes',action:'citation.create',target_type:'charge',target_id:'1',result:'ok',created_at:'2026-07-15 22:35'}] };
+      case 'audit.list': return { rows:[ {id:3,created_at:'2026-07-15 22:35',actor_name:'Ofc. K. Reyes',actor_identifier:'char1:license:cop1',category:'citations',action:'citation.create',target_type:'charge',target_id:'1',result:'ok'}, {id:2,created_at:'2026-07-15 22:10',actor_name:'Ofc. K. Reyes',actor_identifier:'char1:license:cop1',category:'wanted',action:'wanted.add',target_type:'citizen',target_id:'7',result:'ok'} ], total:2, page:1, pageSize:25 };
+      case 'settings.get': return { branding:BRANDING, features:FEATURES, notice:{text:'Schichtwechsel 22:00 – Fahndung Vercetti hat Priorität.'} };
+      case 'settings.save': return {ok:true};
+      default: return {ok:true};
+    }
+  }
+  function totals(items){ let f=0,j=0,p=0; (items||[]).forEach(it=>{ const o=OFFS.find(x=>x.code===it.code); if(o){f+=o.fine*it.quantity;j+=o.jail*it.quantity;p+=o.points*it.quantity;} }); return {fine:f,jail:j,points:p}; }
+  function dash(){ return { onDuty:[{name:'Ofc. K. Reyes',grade_label:'Command'},{name:'Ofc. D. Park',grade_label:'Officer'}], activeWanted:1, openReports:1, todayCharges:3,
+    topWanted:[{reason:'Bewaffneter Raub',level:'high',firstname:'John',lastname:'Vercetti',identifier:REC.record.identifier}],
+    recentCitizens:[{identifier:REC.record.identifier,firstname:'John',lastname:'Vercetti',is_wanted:1,updated_at:'2026-07-15 22:31'}], notice:{text:'Schichtwechsel 22:00 – Fahndung Vercetti hat Priorität.'} }; }
+
+  const realFetch = window.fetch ? window.fetch.bind(window) : null;
+  window.fetch = function(url, opts){
+    const u = String(url);
+    if (u.indexOf('lspdtablet/') !== -1){
+      let body = {}; try { body = JSON.parse((opts&&opts.body)||'{}'); } catch(e){}
+      if (u.endsWith('/close')) { document.getElementById('mt-root').classList.add('mt-hidden'); return Promise.resolve({ json:()=>Promise.resolve({ok:true}) }); }
+      if (u.endsWith('/fingerprintScan')) { return new Promise(res=>setTimeout(()=>res({ json:()=>Promise.resolve({ ok:true, data:{ ok:true, message:'Person identifiziert.', scan: clone(REC) } }) }), 1400)); }
+      const data = route(body.action, body.data);
+      return Promise.resolve({ json:()=>Promise.resolve({ ok:true, data }) });
+    }
+    return realFetch ? realFetch(url, opts) : Promise.reject('no fetch');
+  };
+
+  const s = document.createElement('script'); s.src='app.js';
+  s.onload = function(){ setTimeout(function(){ window.postMessage({ type:'open', payload: route('tablet.bootstrap',{}) }, '*'); }, 60); };
+  document.body.appendChild(s);
+})();
+</script>
+</body>
+</html>
