@@ -1,4 +1,4 @@
---[[ Fuehrerschein-Antraege + Autorisierung durch DOL-Mitarbeiter. ]]
+--[[ Lizenz-Antraege + Autorisierung. Ausstellung setzt die echte ESX-Lizenz. ]]
 
 WL = WL or {}
 
@@ -11,41 +11,44 @@ local function chargeFee(ctx, amount)
     return true
 end
 
-local function validClass(cls)
-    for _, c in ipairs((Config.Templates.Cards[2] and Config.Templates.Cards[2].classes) or { 'B' }) do if c == cls then return true end end
+local function validClass(def, cls)
+    if not def.class then return true end
+    for _, c in ipairs(def.classes or { 'B' }) do if c == cls then return true end end
     return false
 end
 
-local function issueDriver(identifier, class, actor)
-    local u = WL.Wallet.getUser(identifier); if not u then return nil end
-    return WL.Wallet.issue(identifier, 'driver_license', 'driver_license',
-        { firstname = u.firstname, lastname = u.lastname, dateofbirth = u.dateofbirth, class = class },
-        actor, { expiresDays = Config.Cards.driverExpiryDays })
-end
+-- Generischer Lizenzantrag / Direktausstellung (Fuehrerschein & weitere Scheine)
+WL.register('dmv.applyLicense', {}, function(ctx, data)
+    local def = WL.License.defByKey(tostring(data.key or ''))
+    if not def then return WL.fail('invalid_input') end
+    local class = tostring(data.class or (def.classes and def.classes[1] or ''))
+    if not validClass(def, class) then return WL.fail('invalid_input') end
 
--- Selbst-Service: Fuehrerschein beantragen (oder direkt ausstellen)
-WL.register('dmv.applyDriver', {}, function(ctx, data)
-    local class = tostring(data.class or 'B')
-    if not validClass(class) then return WL.fail('invalid_input') end
-    if WL.DB.single("SELECT id FROM lw_cards WHERE identifier = ? AND ctype='driver_license' AND revoked=0", { ctx.identifier }) then
+    -- Besitzt bereits diese Lizenz-Karte?
+    if WL.DB.single("SELECT id FROM lw_cards WHERE identifier = ? AND template_key = ? AND revoked = 0", { ctx.identifier, def.key }) then
         return WL.fail('id_exists')
     end
-    if not chargeFee(ctx, Config.Cards.driverFee) then return WL.fail('no_money') end
+    if not chargeFee(ctx, def.fee) then return WL.fail('no_money') end
 
-    if not Config.Cards.requireApplicationForDriver then
-        local id = issueDriver(ctx.identifier, class, ctx)
+    if not def.requireApplication then
+        local id = WL.License.issueCard(ctx.identifier, def, class, ctx)
         if not id then return WL.fail('db_error') end
-        WL.Audit.log(ctx, { action = 'card.issue', target_type = 'card', target_id = id, new = { ctype = 'driver_license', class = class } })
+        WL.Audit.log(ctx, { action = 'license.issue', target_type = 'card', target_id = id, new = { key = def.key, esxType = def.esxType, class = class } })
         return { ok = true, id = id, message = WL.L('card_issued') }
     end
 
-    if WL.DB.single("SELECT id FROM lw_applications WHERE identifier = ? AND atype='driver_license' AND status='pending'", { ctx.identifier }) then
+    if WL.DB.single("SELECT id FROM lw_applications WHERE identifier = ? AND atype = ? AND status='pending'", { ctx.identifier, def.key }) then
         return WL.fail('app_exists')
     end
     local aid = WL.DB.insert('INSERT INTO lw_applications (identifier, applicant_name, atype, payload) VALUES (?,?,?,?)',
-        { ctx.identifier, ctx.name, 'driver_license', json.encode({ class = class }) })
-    WL.Audit.log(ctx, { action = 'application.create', target_type = 'application', target_id = aid, new = { atype = 'driver_license', class = class } })
+        { ctx.identifier, ctx.name, def.key, json.encode({ class = class }) })
+    WL.Audit.log(ctx, { action = 'application.create', target_type = 'application', target_id = aid, new = { key = def.key, class = class } })
     return { ok = true, id = aid, message = WL.L('app_created') }
+end)
+
+-- Kompatibilitaet: Fuehrerschein direkt
+WL.register('dmv.applyDriver', {}, function(ctx, data)
+    return WL.Handlers['dmv.applyLicense'].fn(ctx, { key = 'driver', class = data.class })
 end)
 
 -----------------------------------------------------------------------------
@@ -64,15 +67,14 @@ WL.register('admin.decideApplication', { perm = 'wallet.admin.authorize' }, func
     local note = tostring(data.note or ''):sub(1, 200)
 
     if decision == 'approve' then
+        local def = WL.License.defByKey(app.atype)
+        if not def then return WL.fail('invalid_input') end
         local payload = app.payload and json.decode(app.payload) or {}
-        local cardId = nil
-        if app.atype == 'driver_license' then
-            cardId = issueDriver(app.identifier, payload.class or 'B', ctx)
-            if not cardId then return WL.fail('db_error') end
-        end
+        local cardId = WL.License.issueCard(app.identifier, def, payload.class, ctx)
+        if not cardId then return WL.fail('db_error') end
         WL.DB.update("UPDATE lw_applications SET status='approved', reviewer_identifier=?, reviewer_name=?, note=?, decided_at=NOW() WHERE id=?",
             { ctx.identifier, ctx.name, note, app.id })
-        WL.Audit.log(ctx, { category = 'default', action = 'application.approve', target_type = 'application', target_id = app.id, new = { card = cardId } })
+        WL.Audit.log(ctx, { action = 'application.approve', target_type = 'application', target_id = app.id, new = { card = cardId, esxType = def.esxType } })
         return { ok = true, message = WL.L('app_approved') }
     elseif decision == 'deny' then
         WL.DB.update("UPDATE lw_applications SET status='denied', reviewer_identifier=?, reviewer_name=?, note=?, decided_at=NOW() WHERE id=?",

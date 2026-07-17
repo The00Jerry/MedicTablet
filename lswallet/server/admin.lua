@@ -27,8 +27,11 @@ WL.register('admin.issue', { perm = 'wallet.admin.issue' }, function(ctx, data)
     local ctype = tostring(data.ctype or '')
     if identifier == '' or not WL.Util.CardTypes[ctype] then return WL.fail('invalid_input') end
     if not WL.Wallet.getUser(identifier) then return WL.fail('player_not_found') end
-    local id = WL.Wallet.issue(identifier, ctype, tostring(data.template_key or ctype), data.data or {}, ctx, { title = data.title or '' })
+    local cardData = data.data or {}
+    local id = WL.Wallet.issue(identifier, ctype, tostring(data.template_key or ctype), cardData, ctx, { title = data.title or '' })
     if not id then return WL.fail('db_error') end
+    -- Lizenzkarte -> echte ESX-Lizenz setzen
+    if (ctype == 'license' or ctype == 'driver_license') and cardData.esxType then WL.License.grant(identifier, cardData.esxType) end
     WL.Audit.log(ctx, { action = 'admin.issue', target_type = 'card', target_id = id, new = { ctype = ctype, to = identifier } })
     return { ok = true, id = id, message = WL.L('card_issued') }
 end)
@@ -38,6 +41,11 @@ WL.register('admin.revoke', { perm = 'wallet.admin.revoke' }, function(ctx, data
     local card = WL.DB.single('SELECT * FROM lw_cards WHERE id = ?', { tonumber(data.id) })
     if not card then return WL.fail('invalid_input') end
     WL.DB.update('UPDATE lw_cards SET revoked = 1, revoked_by = ? WHERE id = ?', { ctx.identifier, card.id })
+    -- Lizenzkarte -> echte ESX-Lizenz entziehen
+    if card.ctype == 'license' or card.ctype == 'driver_license' then
+        local d = card.data and json.decode(card.data) or {}
+        if d.esxType then WL.License.revoke(card.identifier, d.esxType) end
+    end
     WL.Audit.log(ctx, { action = 'admin.revoke', target_type = 'card', target_id = card.id, old = { serial = card.serial } })
     return { ok = true, message = WL.L('card_revoked') }
 end)

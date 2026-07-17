@@ -63,13 +63,28 @@ WL.register('wallet.get', {}, function(ctx, data)
     local cards = WL.Wallet.getCards(ctx.identifier)
     local grouped = { cards = {}, licenses = {}, tickets = {} }
     for _, c in ipairs(cards) do
-        if c.ctype == 'driver_license' then grouped.licenses[#grouped.licenses + 1] = c
+        if c.ctype == 'driver_license' or c.ctype == 'license' then grouped.licenses[#grouped.licenses + 1] = c
         elseif c.ctype == 'ticket' or c.ctype == 'coupon' then grouped.tickets[#grouped.tickets + 1] = c
         else grouped.cards[#grouped.cards + 1] = c end
     end
     -- Job-Wallet an den Anfang der Karten
     local jw = jobWallet(ctx)
     if jw then table.insert(grouped.cards, 1, jw) end
+
+    -- Vorhandene ECHTE ESX-Lizenzen ins Wallet spiegeln (auch anderswo vergebene)
+    local represented = {}
+    for _, c in ipairs(grouped.licenses) do if c.data and c.data.esxType then represented[c.data.esxType] = true end end
+    for _, esxType in ipairs(WL.License.list(ctx.identifier)) do
+        if not represented[esxType] then
+            local def = WL.License.defByEsxType(esxType)
+            grouped.licenses[#grouped.licenses + 1] = {
+                ctype = (def and def.key == 'driver') and 'driver_license' or 'license',
+                template_key = def and def.key or esxType, title = def and def.label or esxType,
+                color = def and def.color or nil, serial = 'ESX-' .. esxType:upper(), virtual = true,
+                data = { firstname = u.firstname, lastname = u.lastname, dateofbirth = u.dateofbirth, esxType = esxType, label = def and def.label or esxType },
+            }
+        end
+    end
 
     local pendingApps = WL.DB.query("SELECT id, atype, status, created_at FROM lw_applications WHERE identifier = ? AND status='pending'", { ctx.identifier }) or {}
 
@@ -80,7 +95,7 @@ WL.register('wallet.get', {}, function(ctx, data)
         pending = pendingApps,
         isAdmin = ctx.can('wallet.admin.view'),
         perms = WL.Perms.list(ctx.perms),
-        dmv = { classes = (Config.Templates.Cards[2] and Config.Templates.Cards[2].classes) or { 'B' }, tickets = Config.Templates.Tickets },
+        dmv = { licenses = Config.Templates.Licenses, tickets = Config.Templates.Tickets },
         fees = { id = Config.Cards.idFee, driver = Config.Cards.driverFee, business = Config.Cards.businessFee },
     }
 end)
@@ -107,6 +122,8 @@ WL.register('dmv.getId', {}, function(ctx, data)
         { firstname = u.firstname, lastname = u.lastname, dateofbirth = u.dateofbirth, sex = u.sex, address = 'Los Santos' },
         ctx, { expiresDays = Config.Cards.idExpiryDays })
     if not id then return WL.fail('db_error') end
+    -- optional: Perso zusaetzlich als echte ESX-Lizenz setzen
+    if Config.Licenses.idEsxType and Config.Licenses.idEsxType ~= '' then WL.License.grant(ctx.identifier, Config.Licenses.idEsxType) end
     WL.Audit.log(ctx, { action = 'card.issue', target_type = 'card', target_id = id, new = { ctype = 'national_id' } })
     return { ok = true, id = id, message = WL.L('id_issued') }
 end)

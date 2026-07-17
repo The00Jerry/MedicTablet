@@ -37,7 +37,8 @@
       { id:3, ctype:'business_card', title:'Kentucky Consulting', serial:'BC5521', data:{firstname:'Elijah',lastname:'Kentucky',company:'Kentucky Consulting',role:'CEO',phone:'555-2130',email:'elk@ls.io',slogan:'We deliver.'} },
     ],
     licenses:[
-      { id:2, ctype:'driver_license', title:'Führerschein', serial:'LSDL77120', issued_at:'2024-08-12', expires_at:'2028-07-27', data:{firstname:'Elijah',lastname:'Kentucky',dateofbirth:'29.02.1992',class:'B'} },
+      { id:2, ctype:'driver_license', title:'Führerschein', serial:'LSDL77120', issued_at:'2024-08-12', expires_at:'2028-07-27', data:{firstname:'Elijah',lastname:'Kentucky',dateofbirth:'29.02.1992',class:'B',esxType:'drive',label:'Fuehrerschein'} },
+      { ctype:'license', template_key:'weapon', title:'Waffenschein', color:'#8a4b3a', serial:'ESX-WEAPON', virtual:true, data:{firstname:'Elijah',lastname:'Kentucky',dateofbirth:'29.02.1992',esxType:'weapon',label:'Waffenschein'} },
     ],
     tickets:[
       { id:4, ctype:'ticket', title:'LJ’s Private Party', serial:'TK9931', data:{event:'LJ’s Private Party',date:'September 4, 23:00',seat:'Unit One'} },
@@ -49,9 +50,11 @@
     data = data || {};
     switch(action){
       case 'wallet.get': return { branding:BRANDING, identity:IDENT, wallet:WALLET, pending:[], isAdmin:true, perms:{'admin.full':true},
-        dmv:{ classes:['B','BE','C','A'], tickets:[ {key:'event_ticket',type:'ticket',label:'Event-Ticket',fields:['event','date','seat']}, {key:'discount_coupon',type:'coupon',label:'Rabatt-Coupon',fields:['shop','discount','valid_until']} ] },
+        dmv:{ licenses:[ {key:'driver',label:'Führerschein',esxType:'drive',class:true,classes:['B','BE','C','A'],fee:500,requireApplication:true}, {key:'weapon',label:'Waffenschein',esxType:'weapon',fee:2500,requireApplication:true}, {key:'boat',label:'Bootsführerschein',esxType:'boat',fee:800}, {key:'fishing',label:'Angelschein',esxType:'fishing',fee:200} ],
+          tickets:[ {key:'event_ticket',type:'ticket',label:'Event-Ticket',fields:['event','date','seat']}, {key:'discount_coupon',type:'coupon',label:'Rabatt-Coupon',fields:['shop','discount','valid_until']} ] },
         fees:{ id:250, driver:500, business:150 } };
       case 'dmv.getId': return {ok:true,id:9,message:'Personalausweis ausgestellt.'};
+      case 'dmv.applyLicense': return {ok:true,id:9,message:'Antrag eingereicht. Ein Mitarbeiter prüft ihn.'};
       case 'dmv.applyDriver': return {ok:true,id:9,message:'Antrag eingereicht. Ein Mitarbeiter prüft ihn.'};
       case 'dmv.businessCard': return {ok:true,id:9,message:'Karte ausgestellt.'};
       case 'tickets.print': return {ok:true,id:9,message:'Ticket/Coupon gedruckt.'};

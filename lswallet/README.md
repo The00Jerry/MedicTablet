@@ -50,6 +50,27 @@ Nach dem Schließen wird die Steuerung vollständig freigegeben.
   (`Config.Templates.JobWallets`, z. B. LSPD/BCSO/FIB/EMS) – nicht gespeichert, immer aktuell.
 - Vorlagen sind in `config/templates.lua` gepflegt und im Admin-Center einsehbar/anpassbar.
 
+## Echte ESX-Lizenzen (Führerschein, Waffenschein, …)
+
+Die Lizenzkarten im Wallet sind **nicht nur kosmetisch** – beim Ausstellen/Entziehen wird die
+**echte ESX-Lizenz** gesetzt bzw. entfernt, damit andere Systeme (Fahren, Waffenkauf,
+Polizei-Check) sie erkennen. Bereits anderweitig vergebene Lizenzen werden automatisch im
+Wallet angezeigt.
+
+- **Backend** (`Config.Licenses.provider`):
+  - `user_licenses` – ESX-Standardtabelle `user_licenses` (Resource `esx_license`) **[Standard]**
+  - `users_json` – Spalte `users.licenses` als JSON-Map `{ drive=true, weapon=true }`
+  - `none` – nur Wallet-Karte, keine echte Lizenz
+- **Lizenztypen** in `config/templates.lua` → `Config.Templates.Licenses` (Führerschein mit
+  Klasse, Waffenschein, Bootsführerschein, Pilotenlizenz, Angelschein …). Jede vergibt ihre
+  echte `esxType`-Lizenz. Fee/Antragspflicht je Lizenz konfigurierbar.
+- **Perso** kann optional zusätzlich eine ESX-Lizenz setzen (`Config.Licenses.idEsxType`).
+- **Voraussetzung** für `user_licenses`: die Tabelle `user_licenses` muss existieren
+  (kommt mit `esx_license`). Fehlt sie, wird die Lizenz nicht gesetzt (Wallet-Karte bleibt).
+
+> `exports['lswallet']:HasLicense(identifier, 'drive')` liefert `true`, sobald der Führerschein
+> ausgestellt wurde – nutzbar von Fahr-/Waffensystemen.
+
 ## Anträge & Autorisierung
 
 Der Führerschein kann als **Antrag** laufen (`Config.Cards.requireApplicationForDriver`):
@@ -80,6 +101,7 @@ exports['lswallet']:HasCard(identifier, ctype)                 -- boolean
 exports['lswallet']:GiveCard(identifier, ctype, templateKey, data, issuedBy) -- cardId
 exports['lswallet']:SetCardProperty(cardId, propertyName, value)  -- boolean
 exports['lswallet']:RevokeCard(cardId)                         -- boolean
+exports['lswallet']:HasLicense(identifier, esxType)           -- boolean (echte ESX-Lizenz)
 ```
 
 ## Events / NUI-Callbacks

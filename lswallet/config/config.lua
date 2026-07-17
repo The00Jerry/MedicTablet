@@ -74,6 +74,27 @@ Config.Cards = {
 }
 
 -----------------------------------------------------------------------------
+-- ECHTE ESX-LIZENZEN (Fuehrerschein, Waffenschein etc.)
+-----------------------------------------------------------------------------
+-- Beim Ausstellen/Entziehen einer Lizenz-Karte wird die ECHTE ESX-Lizenz gesetzt/
+-- entfernt, damit andere Systeme (Fahren, Waffenkauf, Polizei-Check) sie erkennen.
+-- Bereits vorhandene Server-Lizenzen werden im Wallet angezeigt.
+Config.Licenses = {
+    -- Backend:
+    --   'user_licenses' -> ESX-Standardtabelle user_licenses (esx_license) [EMPFOHLEN]
+    --   'users_json'    -> Spalte users.licenses als JSON-Map { drive=true, weapon=true }
+    --   'none'          -> keine echte Lizenz setzen (nur Wallet-Karte)
+    provider = 'user_licenses',
+    table    = 'user_licenses',   -- nur fuer provider 'user_licenses'
+    typeCol  = 'type',
+    ownerCol = 'owner',
+    usersJsonCol = 'licenses',    -- nur fuer provider 'users_json'
+
+    -- Optional: Personalausweis zusaetzlich als ESX-Lizenz setzen (leer = nur Ausweis)
+    idEsxType = '',
+}
+
+-----------------------------------------------------------------------------
 -- Audit / Discord
 -----------------------------------------------------------------------------
 Config.Audit = {

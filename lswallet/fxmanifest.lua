@@ -33,6 +33,7 @@ server_scripts {
     'server/ratelimit.lua',
     'server/audit.lua',
     'server/permissions.lua',
+    'server/license.lua',
     'server/main.lua',
     'server/wallet.lua',
     'server/applications.lua',

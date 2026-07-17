@@ -49,7 +49,7 @@
     $('#cat-back').onclick = renderWallet;
     $('#wl-wallet-body').querySelectorAll('[data-i]').forEach(x => x.onclick = () => viewCard(arr[+x.getAttribute('data-i')]));
   }
-  function cardName(c) { return ({ national_id: 'Personalausweis', driver_license: 'Führerschein', business_card: 'Visitenkarte', job_wallet: 'Dienstmarke', ticket: 'Ticket', coupon: 'Coupon' })[c.ctype] || c.ctype; }
+  function cardName(c) { return ({ national_id: 'Personalausweis', driver_license: 'Führerschein', license: 'Lizenz', business_card: 'Visitenkarte', job_wallet: 'Dienstmarke', ticket: 'Ticket', coupon: 'Coupon' })[c.ctype] || c.ctype; }
 
   // ---------- Card render ----------
   function fieldRow(k, v) { return `<div class="f"><span>${esc(k)}</span><span>${esc(v)}</span></div>`; }
@@ -73,16 +73,17 @@
         <div class="c-body"><div class="c-fields">${Object.keys(d2).map(k => fieldRow(k, d2[k])).join('') || '<div class="f"><span>—</span><span></span></div>'}</div></div>
         <div class="c-foot"><span>${esc(c.serial || '')}</span><span>${esc(c.ctype.toUpperCase())}</span></div></div>`;
     }
-    // national_id / driver_license
+    // national_id / driver_license / license
     const isId = c.ctype === 'national_id';
-    return `<div class="card"><div class="c-head" style="background:${esc(col)}"><span class="c-h1">${esc(isId ? 'UNITED STATES OF AMERICA' : 'LOS SANTOS GOVERNMENT')}</span><span class="c-h2">${esc(isId ? 'Los Santos City' : 'Driving Licence')}</span></div>
+    const sub = isId ? 'Los Santos City' : (c.ctype === 'driver_license' ? 'Driving Licence' : (d.label || 'Licence'));
+    return `<div class="card"><div class="c-head" style="background:${esc(col)}"><span class="c-h1">${esc(isId ? 'UNITED STATES OF AMERICA' : 'LOS SANTOS GOVERNMENT')}</span><span class="c-h2">${esc(sub)}</span></div>
       <div class="c-body"><div class="c-photo">${PHOTO}</div><div class="c-fields">
         ${fieldRow('Name', name)}
         ${d.dateofbirth ? fieldRow('Geburtsdatum', d.dateofbirth) : ''}
         ${isId && d.sex ? fieldRow('Geschlecht', d.sex) : ''}
-        ${!isId && d.class ? fieldRow('Klasse', d.class) : ''}
+        ${d.class ? fieldRow('Klasse', d.class) : ''}
         ${fieldRow('Nr.', c.serial || '')}
-        ${fieldRow('Ausgestellt', fmtDate(c.issued_at))}
+        ${c.issued_at ? fieldRow('Ausgestellt', fmtDate(c.issued_at)) : ''}
         ${fieldRow('Gültig bis', c.expires_at ? fmtDate(c.expires_at) : 'unbegrenzt')}
       </div></div>
       <div class="c-foot"><span>${esc(S.branding.cityName || 'City of Los Santos')}</span><span>${esc(name)}</span></div></div>`;
@@ -114,9 +115,18 @@
     modal('Personalausweis beantragen', `Gebühr: <strong>${money(S.fees.id || 0)}</strong><br>Deine Stammdaten werden übernommen.`, [{ label: 'Abbrechen', cls: 'ghost', fn: closeModal }, { label: 'Ausstellen', cls: 'primary', fn: async () => { const r = await api('dmv.getId'); if (r.ok) { closeModal(); toast(r.data.message || 'Ausgestellt.', 'ok'); await refreshData(); } else toast(err(r), 'error'); } }]);
   }
   function doLicense() {
-    const classes = (S.dmv.classes || ['B']);
-    modal('Führerschein beantragen', `Gebühr: <strong>${money(S.fees.driver || 0)}</strong><div class="wl-mt"><label>Klasse</label><select id="dl-class">${classes.map(c => `<option>${esc(c)}</option>`).join('')}</select></div>`,
-      [{ label: 'Abbrechen', cls: 'ghost', fn: closeModal }, { label: 'Beantragen', cls: 'primary', fn: async () => { const r = await api('dmv.applyDriver', { class: $('#dl-class').value }); if (r.ok) { closeModal(); toast(r.data.message || 'Erledigt.', 'ok'); await refreshData(); } else toast(err(r), 'error'); } }]);
+    const lics = S.dmv.licenses || [];
+    if (!lics.length) return toast('Keine Lizenzen konfiguriert.', 'error');
+    const optHtml = lics.map((l, i) => `<option value="${i}">${esc(l.label)} – ${money(l.fee || 0)}</option>`).join('');
+    const classBox = (l) => (l && l.class) ? `<div class="wl-mt"><label>Klasse</label><select id="dl-class">${(l.classes || ['B']).map(c => `<option>${esc(c)}</option>`).join('')}</select></div>` : '';
+    modal('Lizenz beantragen', `<label>Lizenz</label><select id="dl-lic">${optHtml}</select><div id="dl-extra">${classBox(lics[0])}</div><div id="dl-hint" class="wl-mt" style="color:var(--muted);font-size:12px"></div>`,
+      [{ label: 'Abbrechen', cls: 'ghost', fn: closeModal }, { label: 'Beantragen', cls: 'primary', fn: async () => {
+        const l = lics[+$('#dl-lic').value]; const cls = $('#dl-class') ? $('#dl-class').value : undefined;
+        const r = await api('dmv.applyLicense', { key: l.key, class: cls });
+        if (r.ok) { closeModal(); toast(r.data.message || 'Erledigt.', 'ok'); await refreshData(); } else toast(err(r), 'error');
+      } }]);
+    const upd = () => { const l = lics[+$('#dl-lic').value]; $('#dl-extra').innerHTML = classBox(l); $('#dl-hint').textContent = l.requireApplication ? 'Erfordert Prüfung/Autorisierung durch einen Mitarbeiter.' : 'Wird sofort ausgestellt.'; };
+    $('#dl-lic').onchange = upd; upd();
   }
   function doBusiness() {
     modal('Visitenkarte erstellen', `Gebühr: <strong>${money(S.fees.business || 0)}</strong>

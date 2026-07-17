@@ -105,3 +105,5 @@ end)
 exports('RevokeCard', function(cardId)
     return WL.DB.update('UPDATE lw_cards SET revoked = 1 WHERE id = ?', { tonumber(cardId) }) > 0
 end)
+-- exports['lswallet']:HasLicense(identifier, esxType)  -> boolean (echte ESX-Lizenz)
+exports('HasLicense', function(identifier, esxType) return WL.License and WL.License.has(identifier, esxType) or false end)

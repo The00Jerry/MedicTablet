@@ -47,3 +47,16 @@ Config.Templates.Tickets = {
     { key = 'event_ticket', type = 'ticket', label = 'Event-Ticket', color = '#b3468a', fields = { 'event', 'date', 'seat' } },
     { key = 'discount_coupon', type = 'coupon', label = 'Rabatt-Coupon', color = '#c9a94a', fields = { 'shop', 'discount', 'valid_until' } },
 }
+
+-- Lizenzen (Fuehrerschein & weitere Scheine). Jede Lizenz vergibt zusaetzlich die
+-- echte ESX-Lizenz `esxType` (siehe Config.Licenses). key ist stabil.
+--   class = true  -> Lizenz hat eine Klasse (z.B. Fuehrerscheinklasse)
+--   requireApplication = true -> erst nach Antrag + Autorisierung
+Config.Templates.Licenses = {
+    { key = 'driver',  label = 'Fuehrerschein',        esxType = 'drive',   class = true, classes = { 'B', 'BE', 'C', 'A' },
+      fee = Config.Cards.driverFee, requireApplication = Config.Cards.requireApplicationForDriver, color = '#7c828c' },
+    { key = 'weapon',  label = 'Waffenschein',         esxType = 'weapon',  fee = 2500, requireApplication = true,  color = '#8a4b3a' },
+    { key = 'boat',    label = 'Bootsfuehrerschein',   esxType = 'boat',    fee = 800,  requireApplication = false, color = '#3a6a8a' },
+    { key = 'pilot',   label = 'Pilotenlizenz',        esxType = 'pilot',   fee = 5000, requireApplication = true,  color = '#5b4636' },
+    { key = 'fishing', label = 'Angelschein',          esxType = 'fishing', fee = 200,  requireApplication = false, color = '#2f6f4f' },
+}

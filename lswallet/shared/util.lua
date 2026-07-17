@@ -26,6 +26,6 @@ function WL.Util.money(v)
     return '$' .. (v < 0 and '-' or '') .. out
 end
 
-WL.Util.CardTypes = { national_id = true, driver_license = true, business_card = true, job_wallet = true, ticket = true, coupon = true }
+WL.Util.CardTypes = { national_id = true, driver_license = true, license = true, business_card = true, job_wallet = true, ticket = true, coupon = true }
 
 return WL.Util
